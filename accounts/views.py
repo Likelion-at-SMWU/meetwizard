@@ -177,6 +177,7 @@ def ajax_find_pw_view(request):
     target_user = User.objects.get(username=username, name=name, email=email)
 
     if target_user:
+        return redirect("home")
         auth_num = email_auth_num()
         target_user.auth = auth_num 
         target_user.save()
