@@ -89,7 +89,7 @@ def update(request):
         'schedules':Schedule.objects.filter(user=request.user),
         }
     if request.method == 'POST':
-        if password_change_form.is_valid():
+        if user_change_form.is_valid():
             user_change_form = CustomUserChangeForm(request.user, request.POST)
             user = user_change_form.save()
             return redirect('accounts_update')
