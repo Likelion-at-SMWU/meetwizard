@@ -90,7 +90,7 @@ def update(request):
         'schedules':Schedule.objects.filter(user=request.user),
         }
     if request.method == 'POST':
-        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
+        user_change_form = CustomUserChangeForm(request.POST, request.FILES, instance=request.user)
         if user_change_form.is_valid():
             user_change_form.save()
             return redirect('accounts_update')
@@ -126,29 +126,29 @@ class UserPasswordResetView(PasswordResetView):
         else:
             return render(self.request, 'password_reset_done_fail.html')
 
-# users/views.py 오류나면 아래 다 지워 -혜준
+# # users/views.py 오류나면 아래 다 지워 -혜준
 
-from .forms import RecoveryIdForm
-from django.views.generic import View
+# from .forms import RecoveryIdForm
+# from django.views.generic import View
 
-@method_decorator(logout_message_required, name='dispatch')
-class RecoveryIdView(View):
-    template_name = 'users/recovery_id.html'
-    form = RecoveryIdForm
+# @method_decorator(logout_message_required, name='dispatch')
+# class RecoveryIdView(View):
+#     template_name = 'users/recovery_id.html'
+#     form = RecoveryIdForm
 
-    def get(self, request):
-        if request.method=='GET':
-            form = self.recovery_id(None)
-        return render(request, self.template_name, { 'form':form, })
+#     def get(self, request):
+#         if request.method=='GET':
+#             form = self.recovery_id(None)
+#         return render(request, self.template_name, { 'form':form, })
 
-# users/views.py 오류나면 아래 다 지워 -혜준
+# # users/views.py 오류나면 아래 다 지워 -혜준
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
+# import json
+# from django.core.serializers.json import DjangoJSONEncoder
 
-def ajax_find_id_view(request):
-    name = request.POST.get('name')
-    email = request.POST.get('email')
-    result_id = User.objects.get(name=name, email=email)
-    
-    return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")
+# def ajax_find_id_view(request):
+#     name = request.POST.get('name')
+#     email = request.POST.get('email')
+#     result_id = User.objects.get(name=name, email=email)
+
+#     return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")

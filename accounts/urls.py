@@ -13,8 +13,8 @@ urlpatterns = [
     path('delete/', views.delete, name='accounts_delete'),
     path('password/', views.password, name='password'),
     path('update/', views.update, name='accounts_update'),
-    path('recovery/id/', views.RecoveryIdView.as_view(), name='recovery_id'),
-    path('recovery/id/find/', views.ajax_find_id_view, name='ajax_id'),
+    # path('recovery/id/', views.RecoveryIdView.as_view(), name='recovery_id'),
+    # path('recovery/id/find/', views.ajax_find_id_view, name='ajax_id'),
 
     #비밀번호 재설정을 위한 url
     path('password_reset/', views.UserPasswordResetView.as_view(), name="password_reset"),
