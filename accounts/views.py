@@ -70,7 +70,7 @@ def setting(request):
 def delete(request):
     if request.method == 'POST':
         request.user.delete()
-        return redirect('posts:list')
+        return redirect('home')
     return render(request, 'accounts/delete.html')
 
 @login_required
