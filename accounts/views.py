@@ -89,17 +89,20 @@ def update(request):
         'schedules':Schedule.objects.filter(user=request.user),
         }
     if request.method == 'POST':
-        user_change_form = CustomUserChangeForm(request.user, request.POST)
+        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
         if user_change_form.is_valid():
-            user = user_change_form.save()
+            user_change_form.save()
             return redirect('accounts_update')
         else:
             user_change_form = CustomUserChangeForm(instance = request.user)
-            return render(request, 'accounts/update.html', {'error':'개인정보 수정에 실패하였습니다. \n값을 정확히 입력했는지 확인해주세요.', 'user_change_form':user_change_form})
+            param['error'] = '개인정보 수정에 실패하였습니다. \n값을 정확히 입력했는지 확인해주세요.'
+            param['user_change_form'] = user_change_form
+            return render(request, 'accounts/update.html', param)
 
     else:
         user_change_form = CustomUserChangeForm(instance = request.user)
-        return render(request, 'accounts/update.html', {'user_change_form':user_change_form})
+        param['user_change_form'] = user_change_form
+        return render(request, 'accounts/update.html', param)
 
 
 class UserPasswordResetView(PasswordResetView):
