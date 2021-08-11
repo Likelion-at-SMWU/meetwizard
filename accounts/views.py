@@ -3,6 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
 from accounts.forms import UserCreationForm
 from .forms import CustomUserChangeForm, RecoveryIdForm
 from django.contrib import auth
@@ -13,6 +14,8 @@ from django.contrib.auth.views import PasswordResetView
 from django.views.generic import View
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from .decorators import login_message_required, admin_required, logout_message_required
+from accounts.decorators import *
 
 
 # Create your views here.
@@ -128,13 +131,13 @@ class UserPasswordResetView(PasswordResetView):
             form.save(**opts)
             return super().form_valid(form)
         else:
-            return render(self.request, 'password_reset_done_fail.html')
+            return render(self.request, 'accounts/password_reset_done_fail.html')
 
 # users/views.py 오류나면 아래 다 지워 -혜준
 
 @method_decorator(logout_message_required, name='dispatch')
 class RecoveryIdView(View):
-    template_name = 'users/recovery_id.html'
+    template_name = 'accounts/recovery_id.html'
     form = RecoveryIdForm
 
     def get(self, request):
@@ -153,15 +156,6 @@ def ajax_find_id_view(request):
 
 # 비밀번호 찾기 오류나면 주석처리 해줘 -다연
 from .forms import RecoveryPwForm
-
-# 비 로그인인지 확인하는 함수
-def logout_message_required(function):
-    def wrap(request, *args, **kwargs):
-        if request.user.is_authenticated:
-            messages.info(request, "접속중인 사용자입니다.")
-            return redirect('/users/main/')
-        return function(request, *args, **kwargs)
-    return wrap
 
 @method_decorator(logout_message_required, name='dispatch')
 class RecoveryPwView(View):
@@ -227,14 +221,14 @@ def auth_pw_reset_view(request):
             user = reset_password_form.save()
             messages.success(request, "비밀번호 변경완료! 변경된 비밀번호로 로그인하세요.")
             logout(request)
-            return redirect('users:login')
+            return redirect('login')
         else:
             logout(request)
             request.session['auth'] = session_user
     else:
         reset_password_form = CustomSetPasswordForm(request.user)
 
-    return render(request, 'users/password_reset.html', {'form':reset_password_form})
+    return render(request, 'accounts/password_reset.html', {'form':reset_password_form})
 
 
 
