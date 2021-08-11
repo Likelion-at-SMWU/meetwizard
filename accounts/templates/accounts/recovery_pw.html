@@ -72,7 +72,7 @@
                                 $("" + elementName).remove();
                                 cert_ok = false;
                                 certificationNum = false;
-                                location.href = "{% url 'accounts:recovery_pw' %}"
+                                location.href = "{% url 'recovery_pw' %}"
                             } else {
                                 time = new Date( msLeft );
                                 hours = time.getUTCHours();
@@ -104,7 +104,7 @@
                                 },
                                 success: function (response) {
                                     // location.href = "/users/profile/password/";
-                                    location.href = "{% url 'accounts:recovery_pw_reset' %}";
+                                    location.href = "{% url 'recovery_pw_reset' %}";
                                 },
                                 error: function () {
                                     if ($('#input_auth_num').val()=="") {
