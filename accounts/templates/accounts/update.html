@@ -2,6 +2,365 @@
 {% load bootstrap4 %}
 {% block main-content %}
 
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.css">
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+
+    figure {
+        font-size: 0.9rem;
+    }
+    figure img {    
+        width: 25px;
+        height: 25px;
+    }
+    figure input[type="checkbox"] {
+        position: absolute;
+        right: 0;
+    }
+    .overlay {
+        display: none;
+        z-index: 999;
+        position: fixed;
+        width: 100%; height: 100%;
+        left: 0; top: 0;
+        background-color: rgba(0,0,0, 0.4);
+        overflow-x: hidden;
+    }
+    input {
+        border-radius: 10px;
+        border: 1px solid #000;
+        background-color: #FCFCFB;
+        padding: 7 15 7 15;
+        font-size: 13px;
+    }
+    .description {
+        margin-top: 15;
+        display: block;
+        padding: 10 0;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    /* swiper */
+    .all_slide {    /* 슬라이드, 이전/다음 버튼, 페이지 버튼을 포함한 모든 영역 */
+        width: 100%;
+        height: 150px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .swiper-container { /* 슬라이드와 페이지 버튼을 포함한 영역 */
+        width: 85%;
+    }
+    .swiper-button-prev, .swiper-button-next {  /* 이전, 다음 버튼 */
+        background-color: rgba(255, 255, 255, 0.5);
+        right:10px;
+        padding: 30px;
+        margin-top: -50px;
+        color: purple !important;
+        fill: purple !important;
+        stroke: purple !important;
+    }
+    .swiper-pagination-bullet {     /* 페이지 버튼 */
+        width: 40px; 
+        height: 3px; 
+        border-radius: 5px; 
+        background: transparent; 
+        border: 1px solid #8E44AD; 
+        opacity: 1; 
+    }
+    .swiper-pagination-bullet-active {  /* 페이지 버튼(해당 페이지일 때) */
+        width: 40px; 
+        height: 3px; 
+        transition: width .5s; 
+        border-radius: 5px; 
+        background: #8E44AD; 
+        border: 1px solid transparent; 
+    }
+
+    /* 그룹 세부 CSS */
+    #groups {
+        height: 150px;
+        margin-top: 30px;
+        margin-left: 7%;
+    }
+    #groups .each {
+        display: inline-block;
+        height: 100px;
+        border: 1px solid purple;
+        padding: 20px;
+        border-radius: 20px;
+        color: purple;
+        text-align: center;
+    }
+    #groups .group {
+        background-color: #8E44AD;
+        color: white;
+        text-align: left;
+    }
+    #groups #group_add_btn img {    /* 그룹 추가 버튼 */
+        width: 33px;
+        height: 33px;
+        vertical-align: auto;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+    }
+    #groups .group_number { /* 그룹별 멤버 수 텍스트 */
+        font-size: 0.8rem;
+    }
+    #groups .group_member { /* 그룹별 멤버 텍스트 */
+        font-size: 0.7rem;
+        display: block;
+        margin-top: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        height: 15px;
+    }
+    #groups .group_setting_btn {    /* 그룹 수정 텍스트 버튼 */
+        width: 40px;
+        height: 20px;
+        line-height: 10px;
+    }
+    #groups .group_setting_mode {   /* 그룹 수정모드일 때 */
+        padding: 10 15;
+        background-color: white;
+    }
+    #groups .group_setting_mode .back_button img {  /* 수정모드-뒤로가기 */
+        width: 20px;
+        height: 15px;
+    }
+    #groups .group_setting_mode .group_name {   /* 수정모드-그룹명 */
+        color: purple;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+    #groups .group_setting_mode .edit_btn,  /* 수정모드-수정 버튼 */
+    #groups .group_setting_mode .delete_btn{/* 수정모드-삭제 버튼 */
+        color: white;
+        font-size: 0.8rem;
+        text-align: center;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    #groups .group_setting_mode .edit_btn {     /* 수정모드-수정 버튼 */
+        background-color: #E3C118;
+        margin-bottom: 3px;
+    }
+    #groups .group_setting_mode .delete_btn {   /* 수정모드-삭제 버튼 */
+        background-color: #E31818;
+    }
+
+
+    /* 친구 세부 CSS */
+    #friend_title {
+        margin: 20 0;
+    }
+    #friend #request, #inquire {
+        width: 40%;
+        margin: 0 30;
+    }
+    #friend #request_to_friend, /* 내가 보낸 친구 요청 영역 */
+    #friend #request_to_me {    /* 나에게 온 친구 요청 영역 */
+        width: 100%;
+        min-width: 300px;
+        height: 120px;
+        overflow: auto;
+        border: 1px solid;
+        border-radius: 20px;
+        padding: 15 20 10 20;
+        margin-bottom: 30px;
+    }
+    #friend #friend_add_btn img {   /* 친구 추가 버튼 이미지 */
+        width: 30px;
+        height: 30px;
+    }
+    #friend .request_accept_btn,    /* 친구 요청 수락 버튼 */
+    #friend .request_reject_btn {   /* 친구 요청 거절 버튼 */
+        color: white;
+        width: 50px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+    #friend .request_accept_btn {   
+        background-color: #07C55B;
+    }
+    #friend .request_reject_btn {   
+        background-color: #E31818;
+    }
+    #friend .request_accept_btn:hover,
+    #friend .request_reject_btn:hover {
+        opacity: 0.6;
+    }
+
+    #friend #friend_inquire { /* 친구 조회 영역 */
+        width: 100%;
+        min-width: 300px;
+        height: 310px;
+        overflow: auto;
+        border: 1px solid;
+        border-radius: 20px;
+        padding: 15 20 10 20;
+    }
+    #friend #friend_search_btn{
+        position: relative;
+    }
+    #friend #friend_search_btn input[name="friend_name"] {  /* 친구 조회 검색 창 */
+        width: 230px;
+    }
+    #friend #friend_search_btn img,
+    #friend_search_modal #Mfriend_search_btn img {  /* 친구 요청 모달창 안에 있는 검색 이미지 */
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 16px;
+    }
+    #friend #friends_list { /* 친구 조회의 친구 목록 */
+        overflow: auto;
+        height: 220px;
+        width: 100%;
+        
+    }
+    #friend #friend_inquire .description {
+        margin-top: 110;
+    }
+
+    /* 친구 요청과 친구 조회 부분을 위한 flex */
+    .flex-container {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+    }
+    .flex-item {
+        flex-basis: 40%;
+    }
+
+    /* 모달창 닫기 버튼 */
+    .modal_close {
+        width: 10px;
+        height: 10px;
+        color: black;
+        background-color: white;
+    }
+    .modal_close img{
+        width: 15px;
+        height: 15px;
+    }
+
+    /* 친구 찾기 모달창 */
+    #friend_search_modal,
+    #group_add_modal {
+        position: fixed;
+        width: 500px;
+        height: 500px;
+        top: 50%;
+        left: 50%;
+        margin-top: -250px;
+        margin-left: -250px;
+        background-color: white;
+        padding: 15 30;
+        border-radius: 20px;
+        z-index: 1000;
+    }
+    #friend_search_modal .title,
+    #group_add_modal .title {
+        font-weight: bold;
+    }
+    #friend_search_modal #Mfriend_search_btn {
+        position: relative;
+        top: 10px;
+    }
+    #friend_search_modal #Mfriend_search_btn input[name="friend_username"] {
+        width: 100%;
+    }
+    #friend_search_modal #Mfriends_list {
+        margin-top: 45px;
+        height: 305px;
+        overflow: auto;
+    }
+    #friend_search_modal .add_user_btn {
+        margin-right: 10;
+        width: 20px;
+        height: 20px;
+    }
+
+    /* 그룹 생성 모달창 */
+    #group_add_modal #form_add_group {
+        position: relative;
+    }
+    #group_add_modal .label {
+        color: #33AD8E;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    #group_add_modal #group_member_count {
+        position: absolute;
+        right: 0;
+        font-size: .8rem;
+    }
+    #group_add_modal #friends_list_forcheck {
+        position: relative;
+        height: 250px;
+        overflow: auto;
+    }
+    #group_add_modal form button[type="submit"] {
+        margin-top: 10px;
+        background-color: #33AD8E;
+    }
+    
+    /* 스크롤 바 커스텀 디자인 */
+    ::-webkit-scrollbar { width: 5.2px; } /* 스크롤 바 */
+    ::-webkit-scrollbar-track { background-color:#fff; } /* 스크롤 바 밑의 배경 */
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; } /* 실질적 스크롤 바 */
+    ::-webkit-scrollbar-thumb:hover { background: #404040; } /* 실질적 스크롤 바 위에 마우스를 올려다 둘 때 */
+    ::-webkit-scrollbar-thumb:active { background: #808080; } /* 실질적 스크롤 바를 클릭할 때 */
+    ::-webkit-scrollbar-button { display: none; } /* 스크롤 바 상 하단 버튼 */
+
+    /* 폼의 라벨이 입력시 자동으로 위로 가도록*/
+    .user-box {
+        position: relative;
+    }
+    .user-box input {
+        width: 100%;  
+        padding: 10px 0;
+        font-size: 16px;
+        color: #000;
+        margin-bottom: 15px;
+        border: none;
+        border-bottom: 1px solid #000;
+        border-radius: 0;
+        outline: none;
+        background: transparent;
+    }
+    .user-box label {
+        position: absolute;
+        top:0;
+        left: 0;
+        padding: 10px 0;
+        font-size: 16px;
+        font-weight: bold;
+        color: #33AD8E;
+        pointer-events: none;
+        transition: .5s;
+    }
+    .user-box input:focus ~ label,
+    .user-box input:valid ~ label {
+        top: -20px;
+        left: 0;
+        font-weight: bold;
+        color: #33AD8E;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}
+
 <h1>User Edit</h1>
 
 <form method="POST">
