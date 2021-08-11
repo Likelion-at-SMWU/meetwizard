@@ -91,6 +91,6 @@ class UserCreationForm(forms.ModelForm):
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = get_user_model()
-        fields = ['image', 'password', 'date_of_birth', 'email', 'tel']
+        fields = ['image', 'date_of_birth', 'email', 'tel']
     def clean_password(self):
         return self.initial["password"]
