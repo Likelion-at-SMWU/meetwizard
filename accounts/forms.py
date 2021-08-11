@@ -92,5 +92,5 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = get_user_model()
         fields = ['image', 'password', 'date_of_birth', 'email', 'tel']
-    # def clean_password(self):
-    #     return self.initial["password"]
+    def clean_password(self):
+        return self.initial["password"]
