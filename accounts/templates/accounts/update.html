@@ -24,7 +24,7 @@
         font-weight: bold;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="email"] {
         width: 400px;
     }
 
@@ -53,6 +53,7 @@
 
 {% block js %}
 <script type="text/javascript"> 
+    //패스워드 폼 가리기
     document.getElementById("id_password").parentElement.style = "display:none;"
 </script>
 {% endblock %}
