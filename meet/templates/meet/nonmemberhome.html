@@ -153,6 +153,8 @@
 {% block js %}
 <script>
     function submit_form() {
+        myloc = document.getElementById("myloc");
+        freindloc = document.getElementById("freindloc");               
         if (! myloc.getElementsByClassName("location_keyword")[0].value || ! myloc.getElementsByClassName("lat")[0].value || ! myloc.getElementsByClassName("lng")[0].value || ! freindloc.getElementsByClassName("location_keyword")[0].value || freindloc.getElementsByClassName("lat")[0].value || freindloc.getElementsByClassName("lng")[0].value) {
                 alert("나의 위치와 친구의 위치를 설정해주세요!");
         }
