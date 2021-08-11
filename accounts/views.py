@@ -89,7 +89,7 @@ def update(request):
         'schedules':Schedule.objects.filter(user=request.user),
         }
     if request.method == 'POST':
-        user_change_form = CustomUserChangeForm(request.POST, instance=request.user, request.FILES)
+        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
         if user_change_form.is_valid():
             user_change_form.save()
             return redirect('accounts_update')
@@ -139,3 +139,15 @@ class RecoveryIdView(View):
         if request.method=='GET':
             form = self.recovery_id(None)
         return render(request, self.template_name, { 'form':form, })
+
+# users/views.py 오류나면 아래 다 지워 -혜준
+
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
+def ajax_find_id_view(request):
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    result_id = User.objects.get(name=name, email=email)
+       
+    return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")
