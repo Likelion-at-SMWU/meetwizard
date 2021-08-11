@@ -39,7 +39,7 @@
 <main>
 <h1 id = "profile">프로필 수정</h1>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     
     {% bootstrap_form user_change_form %}

@@ -89,7 +89,7 @@ def update(request):
         'schedules':Schedule.objects.filter(user=request.user),
         }
     if request.method == 'POST':
-        user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
+        user_change_form = CustomUserChangeForm(request.POST, instance=request.user, request.FILES)
         if user_change_form.is_valid():
             user_change_form.save()
             return redirect('accounts_update')
@@ -124,3 +124,18 @@ class UserPasswordResetView(PasswordResetView):
             return super().form_valid(form)
         else:
             return render(self.request, 'password_reset_done_fail.html')
+
+# users/views.py 오류나면 아래 다 지워 -혜준
+
+from .forms import RecoveryIdForm
+from django.views.generic import View
+
+@method_decorator(logout_message_required, name='dispatch')
+class RecoveryIdView(View):
+    template_name = 'users/recovery_id.html'
+    form = RecoveryIdForm
+
+    def get(self, request):
+        if request.method=='GET':
+            form = self.recovery_id(None)
+        return render(request, self.template_name, { 'form':form, })
