@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib import messages
-#from .models import User
+from .models import User
 from django.http import HttpResponse
 
 
