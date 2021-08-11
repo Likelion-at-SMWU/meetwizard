@@ -117,7 +117,8 @@
     </div>
 
     <div id = "content" class = "content">    
-        <form method="POST">
+        <form method="POST" id="form">
+            {% csrf_token %}
             <!--위치입력-->
             <div id="myloc" class="loc">
                 <input class="location_keyword" type="text" name="my_address" type="text" placeholder="나의 위치를 검색해주세요" onKeypress="javascript:if(event.keyCode==13) {getPostcode(this.parentNode.id);}"/>
@@ -133,13 +134,12 @@
                 <img id="search_btn" src="{% static 'images/search.png' %}" onclick="getPostcode(this.parentNode.id);"/>
             </div>
             <br>
-            <button type="submit" value="중간지점 구하기">
         </form>
     </div>
 
 
     <!--위치 찾을 친구 추가하기-->
-    <input class = "addbtn" type='button' value= "친구추가하기" onclick="add_textbox()">
+    <input class = "addbtn" type='button' value= "중간지점 구하기" onclick="submit_form()">
     <img class="userpls" src= "{% static 'images/user-plus.png' %}" alt="Card image cap">
 
     <!--지도 api-->
@@ -151,6 +151,17 @@
 {% endblock %}
 
 {% block js %}
+<script>
+    function submit_form() {
+        if (! myloc.getElementsByClassName("location_keyword")[0].value || ! myloc.getElementsByClassName("lat")[0].value || ! myloc.getElementsByClassName("lng")[0].value || ! freindloc.getElementsByClassName("location_keyword")[0].value || freindloc.getElementsByClassName("lat")[0].value || freindloc.getElementsByClassName("lng")[0].value) {
+                alert("나의 위치와 친구의 위치를 설정해주세요!");
+        }
+        else {
+            document.getElementById('form').submit();
+        }
+    }
+</script>
+
 <!-- 결과값이 있으면 사용자에게 보여주기-->
 {% if result %}
 <script type="text/javascript">

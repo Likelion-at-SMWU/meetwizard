@@ -152,7 +152,7 @@ def ajax_find_id_view(request):
     email = request.POST.get('email')
     result_id = User.objects.get(name=name, email=email)
 
-    return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")
+    return HttpResponse(json.dumps({"result_id": result_id.username}, cls=DjangoJSONEncoder), content_type = "application/json")
 
 # 비밀번호 찾기 오류나면 주석처리 해줘 -다연
 from .forms import RecoveryPwForm

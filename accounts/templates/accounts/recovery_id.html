@@ -38,13 +38,11 @@
                         'csrfmiddlewaretoken': '{{csrf_token}}',
                     },
                     success: function (response) {
-                        console.log(response);
                         $('#result_id').replaceWith(
                             '<div id="result_id"><hr><div><span>입력된 정보로 가입된 아이디는 </span><span id="result_id">' +
                                 response.result_id +'</span><span> 입니다.</span></div><hr></div>')
                     },
                     error: function () {
-                        console.log(response);
                         if (name == "" || email == "") {
                             alert('이름와 이메일을 입력해주세요.');
                         } else {
