@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404, redirect
 from accounts.forms import UserCreationForm
 from .forms import CustomUserChangeForm
@@ -149,5 +150,5 @@ def ajax_find_id_view(request):
     name = request.POST.get('name')
     email = request.POST.get('email')
     result_id = User.objects.get(name=name, email=email)
-       
+    
     return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")

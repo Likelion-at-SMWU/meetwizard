@@ -2,6 +2,10 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 
+# users/urls.py 오류나면 아래 두 줄에 해당되는 urlpatterns 지워 -혜준
+#path('recovery/id/', views.RecoveryIdView.as_view(), name='recovery_id'),
+#path('recovery/id/find/', views.ajax_find_id_view, name='ajax_id'),
+
 urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('login/', views.login, name='login'),
@@ -9,6 +13,8 @@ urlpatterns = [
     path('delete/', views.delete, name='accounts_delete'),
     path('password/', views.password, name='password'),
     path('update/', views.update, name='accounts_update'),
+    path('recovery/id/', views.RecoveryIdView.as_view(), name='recovery_id'),
+    path('recovery/id/find/', views.ajax_find_id_view, name='ajax_id'),
 
     #비밀번호 재설정을 위한 url
     path('password_reset/', views.UserPasswordResetView.as_view(), name="password_reset"),

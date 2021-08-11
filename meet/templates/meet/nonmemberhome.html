@@ -149,7 +149,7 @@
 {% block js %}
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=83649d17ed6ffdbebc59d18cca995938&libraries=services"></script>
 <script>
-    //KAKAO API를 통해 지도 불러오기
+    //KAKAO API를 통해 지도 불러오기(동)
     var container = document.getElementById('map');
     var options = {
         center: new kakao.maps.LatLng(37.546478390980596, 126.96486293693982),  //중심점
@@ -157,13 +157,13 @@
     };
     var map = new kakao.maps.Map(container, options);
 
-    // 지도에 확대 축소 컨트롤을 생성한다
+    // 지도에 확대 축소 컨트롤을 생성한다(동)
     var zoomControl = new kakao.maps.ZoomControl();
 
-    // 지도의 우측에 확대 축소 컨트롤을 추가한다
+    // 지도의 우측에 확대 축소 컨트롤을 추가한다(동)
     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
-    //model에 저장된 사용자의 위치를 마커로 표시
+    //model에 저장된 사용자의 위치를 마커로 표시(*)
     marker = new kakao.maps.Marker({
         map: map,
         position: new kakao.maps.LatLng(37.546478390980596, 126.96486293693982),
@@ -186,18 +186,18 @@
         });
     });
 
-    //지도의 중심점을 변경하는 함수
+    //지도의 중심점을 변경하는 함수(동)
     function changePoint(lat, long) {
         map.setCenter(new kakao.maps.LatLng(lat, long));
         map.setLevel(3);
     }
 
-    //마커의 위치를 변경하는 함수
+    //마커의 위치를 변경하는 함수(동)
     function changeMarker(lat, long) {
         marker.setPosition(new kakao.maps.LatLng(lat, long));
     }
 
-    //좌표-주소 변환하고 form에 주소를 저장하는 함수
+    //좌표-주소 변환하고 form에 주소를 저장하는 함수(동)
     function getAddress(lat, long) {
         var geocoder = new kakao.maps.services.Geocoder();  //주소-좌표 변환 객체 생성
         geocoder.coord2Address(long, lat, function(result, status) {
@@ -221,13 +221,13 @@
         });
     }
 
-    //form의 latitude와 longitude에 값을 저장하는 함수
+    //form의 latitude와 longitude에 값을 저장하는 함수(동)
     function setFormLatLng(lat, long) {
         document.getElementById("latitude").value = lat; //form에 latitude 저장
         document.getElementById("longitude").value = long;//form에 longitude 저장
     }
 </script>
-<script type="text/javascript">
+<script type="text/javascript">//동일
     function loadCoords() {
         const loadedCoords = localStorage.getItem("coords");
         //현재 위치 값을 받아옴
