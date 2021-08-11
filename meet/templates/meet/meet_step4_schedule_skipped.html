@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+
+<style type = "text/css">
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+    #header {
+        margin-right: -55px;
+        margin-bottom: 50px;
+    }
+
+    /*#result_schedule {
+        margin-top: 5%;
+        float: left;
+        margin-left: 7%;
+        width: 250px;
+    }
+    #result_schedule .item_red {
+        background-color:#FF8683;
+        border-top: none;
+        border-bottom: none;
+    }
+    #result_schedule .item_green {
+        background-color:#62D77D;
+        border: none;
+    }
+    #result_schedule th, #result_schedule td{
+        padding: 0;
+    }
+    #result_schedule #legend_red, #result_schedule #legend_green {
+        display: inline-block;
+        width: 25px;
+        height: 10px;
+        margin-right: 5px;
+    }
+    #result_schedule #legend_red {
+        background-color:#FF8683;
+    }
+    #result_schedule #legend_green {
+        background-color:#62D77D;
+    }
+    #result_schedule .legend_text {
+        font-size: 10px;
+    }*/
+    .star-icon {
+        width: 20px;
+        margin-left: 2.5px;
+        margin-right: 2.5px;
+    }
+    div#title {
+        margin-top: 50px;
+    }
+
+    .previous_button{
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        font-size: 10pt;
+        padding: 5px;        
+        float: right;
+        margin-right: 15%;
+    }
+
+    .previous_button:visited{
+        color:white;
+    }
+    .previous_button:hover{
+        color: white;
+        cursor: pointer;
+        text-decoration: none;
+        background-color: rgba(142,68,173,0.8);
+    }
+    .api{
+        margin-left: 30%;
+        width: 800px;
+        height: 550px;
+        
+    }
+
+    .info_btn{
+        float: left;
+        padding: 50px 0px;
+    }
+
+
+    .btns {
+        width: 130px;
+    }
+    .food_btn, .cafe_btn, .movie_btn, .parking_btn, .accomodation_btn{
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        background-color: #c0c0c0;
+    }
+    .info_btn .active {
+        background-color: #33AD8E;
+    }
+
+    #map{
+        float: left;
+        margin-left: 20%;
+        width: 600px;
+        height:500px;
+
+    }
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <div id="header" class="d-flex justify-content-between">
+        <div>
+            <img class="icon" src="{% static 'images/star.png' %}"/>
+            <span>탐색 결과 - STEP 4</span>
+        </div>
+        <a class = "previous_button" href="{% url 'meet_step3_schedule_skipped' %}">&lt;Previous</a>
+    </div>
+
+    <!--지도 api-->
+    <div id="map"></div>
+
+    <!--음식점/카페/영화관/주차장/숙박 정보 버튼-->
+    <section class = "center">
+
+        <div class = "info_btn">
+            <form method ='POST'>
+                {% csrf_token %}
+                <p><div class ="btns"><button id="category1" class="food_btn" name="food_btn" type = "buttons">음식점</button></div></p>
+            </form>
+
+            <form method ='POST'>
+                {% csrf_token %}
+                <p><div class ="btns"><button id="category2" class = "cafe_btn" name="cafe_btn" type = "buttons">카페</button></div></p>
+            </form>
+
+            <form method ='POST'>
+                {% csrf_token %}
+                <p><div class ="btns"><button id="category3" class = "movie_btn" name="movie_btn" type = "buttons">문화시설</button></div></p>
+            </form>
+
+            <form method ='POST'>
+                {% csrf_token %}
+                <p><div class ="btns"><button id="category4" class = "parking_btn" name="parking_btn" type = "buttons">주차장</button></div></p>
+            </form>
+
+            <form method ='POST'>
+                {% csrf_token %}
+                    {{form}}
+                <p><div class ="btns"><button id="category5" class = "accomodation_btn" name="accomodation_btn" type = "buttons">숙박</button></div></p>
+            </form>      
+        </div>
+    </section>
+    {% if category == 1 %}
+
+    {% elif category == 2 %}
+
+    {% elif category == 3 %}
+
+    {% elif category == 4 %}
+    
+    {% elif category == 5 %}
+    
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=83649d17ed6ffdbebc59d18cca995938&libraries=services"></script>
+<script>
+// 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
+var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = {
+        center: new kakao.maps.LatLng(37.546478390980596, 126.96486293693982), // 지도의 중심좌표
+        level: 3 // 지도의 확대 레벨
+    };  
+
+// 지도를 생성합니다    
+var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+// 장소 검색 객체를 생성합니다
+var ps = new kakao.maps.services.Places(map); 
+
+if (!"{{ category }}")  {
+    marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng(37.546478390980596, 126.96486293693982),
+        image: new kakao.maps.MarkerImage("{% static 'images/marker_icon.png' %}", new kakao.maps.Size(31, 35), new kakao.maps.Point(13, 34)),
+    });
+    marker.setMap(map);
+}
+if ("{{ category }}" == 1) {
+    // 카테고리로 식당을 검색합니다
+    ps.categorySearch('FD6', placesSearchCB, {useMapBounds:true}); 
+} else if ("{{ category }}" == 2) {
+    // 카테고리로 카페을 검색합니다
+    ps.categorySearch('CE7', placesSearchCB, {useMapBounds:true}); 
+} else if ("{{ category }}" == 3) {
+    // 카테고리로 문화시설을 검색합니다
+    ps.categorySearch('CT1', placesSearchCB, {useMapBounds:true}); 
+} else if ("{{ category }}" == 4) {
+    // 카테고리로 주차장을 검색합니다
+    ps.categorySearch('PK6', placesSearchCB, {useMapBounds:true}); 
+} else if ("{{ category }}" == 5) {
+    // 카테고리로 숙박을 검색합니다
+    ps.categorySearch('AD5', placesSearchCB, {useMapBounds:true}); 
+} 
+
+// 키워드 검색 완료 시 호출되는 콜백함수 입니다
+function placesSearchCB (data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+        for (var i=0; i<data.length; i++) {
+            displayMarker(data[i]);
+        }     
+    }     
+}
+
+
+// 지도에 마커를 표시하는 함수입니다
+function displayMarker(place) {
+        // 마커를 생성하고 지도에 표시합니다
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(place.y, place.x)
+        });
+        
+        marker.setMap(map);
+
+        // 마커에 클릭이벤트를 등록합니다
+        kakao.maps.event.addListener(marker, 'click', function() {
+            // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+            infowindow.open(map, marker);    
+        });
+    
+}
+</script>
+
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('step4').classList.add('active');
+    
+    if("{{ category }}") {
+        document.getElementById('category' + "{{ category }}").classList.add('active');
+    }
+
+</script>
+{% endblock %}

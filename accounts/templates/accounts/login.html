@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style type="text/css">
+    @font-face {
+                font-family: 'Cafe24Ssurround';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+            }
+
+    #main{
+        border : solid 2px;
+        border-color: #8E44AD;
+        border-radius: 20px;
+        width : 800px;
+        height: 380px;
+        margin-top: 7%;
+        margin-left: 30%;
+    }
+
+    #main .logo{
+        background-color: white;
+        width:280px;
+        color: black;
+        margin-top: -6.5%;
+        margin-left: 33%;
+    }
+
+    h4{
+        color: #8E44AD;
+        font-family: 'Cafe24Ssurround';
+        margin-top : 4%;
+        margin-left: 15%;
+    }
+    
+    .hr1{
+        background-color: #707070;
+        width: 120px;
+        height: 2px;
+        border:0;
+        margin-top: 1%;
+        margin-left: 13%;
+    }
+
+    .username, .password{
+        width: 220px;
+        border-top:none;
+        border-left:none;
+        border-right:none;
+        margin-top: -0.5%;
+    }
+
+    .input{
+        margin-left: 28%;
+    }
+
+    .submit{
+        margin-top: -2%;
+        margin-left:62%;
+        width:65px;
+        height:50px;
+        color: white;
+        background-color: #8E44AD;
+        border-radius:10px;
+        border: solid 0px;
+    }
+
+    span.buttons{
+        margin-left:33%;
+    }
+
+    .signup, .findid, .findpw{
+        color:black;
+    }
+
+    .signup:hover, .findid:hover, .findpw:hover{
+        text-decoration:none;
+        color: #707070;
+    }
+
+
+</style>
+
+{% endblock %}
+
+{% block main-content %}
+
+<!--login main content-->
+<section id = "main">
+    <p class = "logo">
+        MeetWizard
+    </p>
+
+    <span class = "login">
+        <h4>LOG IN</h4>
+        <hr class="hr1">
+    </span>
+
+    <form class = "input" method="POST" action="{% url 'login' %}">
+
+        {% csrf_token %}
+        <br>
+        USERNAME>
+        <input class="username" name="username" type="text" value="" placeholder="아이디" tabindex="1">
+        <br>
+        <input class="submit" type="submit" value="LOGIN">
+        <br>
+        PASSWORD>
+        <input class="password" name="password" type="password" value="" placeholder="비밀번호" tabindex="2">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        
+    </form>
+<br>
+    <span class = "buttons">
+        <a class="signup" href="{% url 'signup'%}">회원가입</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="findid" href="#">아이디찾기</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="findpw" href="{% url 'password_reset' %}">비밀번호찾기</a>       
+    </span>
+</section>
+
+{% endblock %}

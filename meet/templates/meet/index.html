@@ -1,0 +1,179 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    @font-face{   
+        font-family: 'HeirofLightBold';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/HeirofLightBold.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Cafe24Ssurround';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+    
+
+    .mainlogo {
+        margin-left: 35%;
+        margin-top: 10%;
+    }
+
+    .logo{
+        font-family: 'HeirofLightBold';
+        font-size: 5rem;
+    }
+    .logomessage{
+        font-family: 'HeirofLightBold';
+        font-size: 1.5rem;
+        margin-left: -7%;
+    }
+    .logomessage2{
+        font-family: 'HeirofLightBold';
+        font-size: 1.5rem;
+        color: rgba(142,68,173)
+    }
+
+    #wrapper{
+        width: 1200px;
+        height: 800px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding-top: 20%;
+    }
+
+    .main{
+        margin-left: 5%;
+        padding-left: 5%;
+    }
+
+    .main .mainloc{
+    width: 170px;
+    height: 140px;
+    margin-left: 70px;
+    margin-top: 30px;
+    }
+
+    .main .mainpl{
+        width: 50px;
+        height: 30px;
+        margin-left: 75px;
+        margin-top : 30px;
+    }
+
+    .main .mainsch{
+        width: 170px;
+        height: 140px;
+        margin-left: 90px;
+        margin-top: 30px;
+    }
+
+    .main .maineq{
+        width: 50px;
+        height: 30px;
+        margin-left: 75px;
+        margin-top : 30px;
+    }
+
+    .main .maincd{
+        width: 150px;
+        height: 90px;
+        margin-left: 90px;
+        margin-top: 30px;
+    }
+
+    .square{
+        font-family: 'Cafe24Ssurround';
+        font-size: 20px;
+        font-weight: 900;
+        padding-left:6%;
+        margin-left: 10%;
+        margin-top:5%;
+        margin-bottom: -50px;
+    }
+    .first{
+        border: 0;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: .5rem .9em;
+        text-align: center;
+        vertical-align: middle;
+        margin-right:220px;
+    }
+    .second{
+        border: 0;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: .5rem .9em;
+        text-align: center;
+        vertical-align: middle;
+        margin-right:220px;
+    }
+    .third{
+        border: 0;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: .5rem .9em;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    
+</style>
+{% endblock %}
+
+{% block main-content %}
+<div id = "wrapper">
+
+    <!--아이콘 세개 이미지-->
+    <div class = "main">
+        <img class="mainloc" src= "{% static 'images/mainlocation.png' %}" alt="Card image cap">
+        <img class="mainpl" src = "{% static 'images/mainplus.png' %}" alt = "Card image cap">
+        <img class="mainsch" src= "{% static 'images/mainschedule.png' %}" alt="Card image cap">
+        <img class="maineq" src= "{% static 'images/mainequal.png' %}" alt="Card image cap">
+        <img class="maincd" src="{% static 'images/maincheckdouble.png' %}" alt ="Card image cap"> 
+    </div>
+
+    <div class = "square">
+        <span class = "first">1. 위치정보입력</span>
+        <span class = "second">2. 시간정보입력</span>
+        <span class = "third">MEET!</span>
+    </div>
+    <br><br><br><br>
+
+    <!--메인로고-->
+    <div class = "mainlogo">
+        <span class = "logo">Meet Wizard</span>
+        <br>
+        <span class = "logomessage">한번의 클릭으로 약속시간과 장소를 정해주는,</span>
+        <span class = "logomessage2">&nbsp;나만의 비서</span>
+    </div> 
+
+</div>
+
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+		<script>
+            alert('환영합니다. 확인버튼을 누르면 2초 후 자동으로 화면이 전환됩니다.')
+            $(document).ready(function(){
+                setTimeout(function(){
+                    window.location.href="{% url 'nonmemberhome' %}";
+                },2000)
+            })
+			
+		</script>
+
+
+{% endblock %}

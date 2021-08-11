@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    @font-face{   
+                font-family: 'HeirofLightBold';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/HeirofLightBold.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+            }
+    
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+    #center {
+        width: 400px; 
+        height: 300px;
+        position: absolute; 
+        top: 50%;
+        left: 50%; 
+        margin-top: -8%;
+        margin-left: -8%;
+        /*padding: 200px;
+        margin-left: 200px;*/
+    }
+    #center .mw{
+        text-align: center;
+        font-family: 'HeirofLightBold';
+        font-size:35px;
+        color:#8E44AD;
+    }
+    #center .hr{
+        margin-top: 5px;
+        background-color: #707070;
+        width: 300px;
+        height: 2px;
+        border:0;
+    }
+    .bigbtn {
+        border: 0;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: 1.5rem 6rem;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 35px;
+        font-weight: 800;
+        margin: 50 0 0 50;
+    }
+    .bigbtn:hover{
+        background-color: rgba(142,68,173,0.8);
+        cursor: pointer;
+    }
+    .msg {
+        margin: 35 0 0 50;
+    }
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <div id="center">
+        <div id="brand">
+            <div class="mw">Meet Wizard</div>
+            <hr class = "hr">
+        </div>
+        <button class ="bigbtn" type="buttons" onclick="location.href='/meet/step1'">MEET!</button>
+        <p class = "msg">(meet 버튼 클릭시, 서비스가 시작됩니다.)</p>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('nav_home').classList.add('active')
+
+</script>
+{% endblock %}

@@ -1,0 +1,1 @@
+web: gunicorn meetwizard.wsgi --log-file -

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    p.title {
+        border: solid 2px;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        font-weight: bold;
+        font-size: 1.5rem;
+        text-align: center;
+        padding: 20px;
+    }
+    .showall_profile {
+        width: 90px;
+        float: left;
+    }
+    div.col {
+        margin-bottom: 50px;
+        margin-right: 0px;
+    }
+    .user_info {
+        margin-top: 10px;
+        margin-left: 100px;
+    }
+    span {
+        font-size: 14px;
+    }
+    span.user_id {
+        font-family: 'Cafe24Ssurround';
+        font-size: 17.5px;
+    }
+    .back_button{
+        display: inline-block;
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        font-size: 10pt;
+        padding: 5px;        
+        float: right;
+        width: 80px;
+        text-align: center;
+        margin-top:3%;
+        margin-right: 1%;
+    }
+    .back_button:visited{
+        color:white;
+    }
+    .back_button:hover{
+        color: white;
+        cursor: pointer;
+        text-decoration: none;
+        background-color: rgba(142,68,173,0.8);
+    }
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <a class = "back_button" href="{% url 'friendgroup' %}">&lt;BACK</a><br><br>
+    <p class="title">{{ group.name }}</p>
+    <br>
+
+    <div class="container">
+        {% for member in group_members %}
+        {% if forloop.counter|divisibleby:2 == 0 %} <!--2개씩 row로 묶기 위해-->
+        <div class='row'>
+        {% endif %}
+            <div class="col">
+                {% if member.member.image %}
+                <img class="showall_profile" src="{{ member.member.image.url }}">
+                {% else %} 
+                <img class="showall_profile" src="{% static 'images/user2_icon.png' %}">
+                {% endif %}
+                <div class="user_info">
+                    <span class="user_id">{{ member.member.username }}</span><br>
+                    <span><strong>이름: </strong>{{ member.member.name }}</span><br>
+                    <span><strong>TEL) </strong>{{ member.member.tel }}</span>
+                </div>
+            </div>
+        {% if forloop.counter|divisibleby:2 == 1 %}
+        </div>
+        {% endif %}
+        {% if forloop.last and forloop.counter|divisibleby:2 == 0 %}    <!--크기를 맞추기 위해 group이 홀수개라면 공간을 만듦-->
+        <div class="col" style="visibility: hidden;"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('nav_friendgroup').classList.add('active');
+
+</script>
+{% endblock %}

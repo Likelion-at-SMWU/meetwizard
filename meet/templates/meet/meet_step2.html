@@ -1,0 +1,854 @@
+<!--TODO:location값 없으면 값 없다고 설정하라고 알려줘야함-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+    .star-icon {
+        width: 20px;
+        margin-left: 2.5px;
+        margin-right: 2.5px;
+    }
+    div#title {
+        margin-top: 50px;
+    }
+    section.main {
+        border: solid 1px;
+        border-radius: 20px;
+        width: 970px;
+        margin-left: 100px;
+        margin-top: 20px;
+        padding: 20px;
+        padding-top: 30px;
+        padding-left: 70px;
+    }
+    p strong {
+        font-size: 17px;
+    }
+    img.my_location {
+        width: 60%;
+        margin-top: -10px;
+    }
+    .previous_button, .next_button, .next_button_1, .next_button_2 {
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        font-size: 10pt;
+        padding: 5px;        
+        float: right;
+    }
+    .previous_button {
+        width: 80px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .next_button {
+        width: 60px;
+        text-align: center;
+        margin-right: 120px;
+    }
+    .next_button_1, .next_button_2 {
+        display: none;
+        width: 60px;
+        text-align: center;
+        margin-right: 120px;
+    }
+    .skip_button_1, .edit_button_1 {
+        margin-top: 0px;
+        margin-right: 60px;
+        display: inline-block;
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        font-size: 10pt;
+        text-align: center;
+        padding: 1px;
+        width: 50px;
+        float: right;
+    }
+    .skip_button_1 {
+        margin-right: 10px;
+        margin-left: 0px;
+    }
+    .skip_button_2, .edit_button_2 {
+        margin-top: 0px;
+        margin-right: 60px;
+        display: inline-block;
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        color: #ffffff;
+        font-size: 10pt;
+        text-align: center;
+        padding: 1px;
+        width: 50px;
+        float: right;
+    }
+    .skip_button_2 {
+        margin-right: 10px;
+    }
+
+    .help-tip{
+        position: absolute;
+        top: -12px;
+        right: 180px;
+        text-align: center;
+        background-color: #8E44AD;
+        border-radius: 50%;
+        width: 17px;
+        height: 17px;
+        font-size: 12px;
+        line-height: 20px;
+        cursor: default;
+    }
+
+    .help-tip:before{
+        content:'?';
+        font-weight: bold;
+        color:#fff;
+    }
+
+    .help-tip:hover p{
+        display:block;
+        transform-origin: 100% 0%;
+        -webkit-animation: fadeIn 0.3s ease-in-out;
+        animation: fadeIn 0.3s ease-in-out;
+        z-index: 1;
+    }
+
+    .help-tip p{
+        display: none;
+        text-align: left;
+        background-color: #1E2021;
+        opacity: 0.7;
+        padding: 20px;
+        width: 300px;
+        position: absolute;
+        border-radius: 3px;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        right: -4px;
+        color: #FFF;
+        font-size: 13px;
+        line-height: 1.4;
+        z-index: 1;
+    }
+
+    .help-tip p:after{
+        width:100%;
+        height:40px;
+        content:'';
+        position: absolute;
+        top:-40px;
+        left:0;
+        z-index: 1;
+    }
+/*여기부터 코드가 다름*/
+
+    .not_yet {
+        display: inline-block;
+        font-size: 11px;
+        margin-top: -25px;
+        border: solid 0px;
+        border-radius: 5px;
+        padding: 1px;
+        background-color: #F8EC9E; 
+    }
+
+    .not_yet2 {
+        display: inline-block;
+        font-size: 11px;
+        margin-top: 0px;
+        margin-bottom: 5px;
+        border: solid 0px;
+        border-radius: 5px;
+        padding: 1px;
+        background-color: #F8EC9E; 
+    }
+    #exclamation {
+        font-size: 15px;
+        font-weight: bold;
+        color: red;
+    }
+    .my_schedule .schedule table {
+        margin-left: 10px;
+        margin-top: 0px;
+        width: 300px;
+        height: 400px;
+    }
+    .my_schedule .schedule table th,
+    .my_schedule .schedule table td {
+        font-size: 0.8rem;
+        text-align-last: center;
+        border-left: 1px solid #E2D7F1;
+        border-bottom: 1px solid #E2D7F1;
+    }
+    .my_schedule .schedule thead th {
+        border-top: 1px solid #E2D7F1;
+        border-bottom: 1.5px solid #E2D7F1;
+    }
+    .my_schedule .schedule .time {
+        border-left: none;
+    }
+    .my_schedule .schedule .X {
+        background-color:#FF8683;
+        border-bottom: none;
+    }
+    .my_schedule .schedule .O {
+        background-color:#62D77D;
+        border-bottom: none;
+    }
+
+    div.input-box input {
+        width: 200px;
+        border: solid 1px;
+        border-radius: 5px;
+        font-size: 12px;
+    }
+    .my_schedule_skipped{
+        display: none;
+        text-align: center;
+        border: outset 4px #ffffff;
+        border-radius: 20px;
+        width: 350px;
+        height: 470px;
+        padding: 2px;
+        background-color: #f8f8f8;
+    }
+    .my_schedule_skipped p {
+        margin-top: 100px;
+        font-size: 14px;
+    }
+    .my_location_skipped{
+        display: none;
+        text-align: center;
+        border: outset 4px #ffffff;
+        border-radius: 20px;
+        width: 350px;
+        height: 470px;
+        padding: 2px;
+        background-color: #f8f8f8;
+    }
+    .my_location_skipped p {
+        margin-top: 100px;
+        font-size: 14px;
+    }
+    .cancel {
+        font-size: 12px;
+        height: 21px;
+    }
+    #location_body {
+        margin-left: 30px;
+        margin-top: 0px;
+    }
+    button[name="save"] {
+        margin-left: 20px;
+    }
+    input[name="address"] {
+        font-size: 12px;
+        width: 80%;
+        float: left;
+        border: none;
+        border-bottom: 1px solid;
+        margin-left: -30px;
+        margin-bottom: 10px;
+    }
+    input[name="address"]:focus {
+        outline: none;
+    }
+
+    #map {
+        width: 400px;
+        height: 400px;
+        float:left;
+        margin-left: -30px;
+        z-index: -1;
+    }
+
+    @-webkit-keyframes fadeIn {
+        0% { 
+            opacity:0; 
+            transform: scale(0.6);
+        }
+
+        70% {
+            opacity:70%;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes fadeIn {
+        0% { opacity:0; }
+        70% { opacity:70%; }
+    }
+
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <div id="title">
+        <img class="star-icon" src="{% static 'images/star.png' %}">
+        <span>탐색 결과 찾기 - STEP 2</span>
+    </div>
+
+    <!-- <a class = "next_button" href="{% url 'meet_step3' %}">Next></a>  -->
+    <a class = "next_button" href="javascript:void(0)" onclick="nolocation();">Next></a> 
+    <a class = "next_button_1" href="{% url 'meet_step3_schedule_skipped' %}">Next></a> 
+    <a class = "next_button_2" href="{% url 'meet_step3_location_skipped' %}">Next></a> 
+    <a class = "previous_button" href="{% url 'meet_step1' %}">&lt;Previous</a>&nbsp;&nbsp;
+    <!--<form method="POST" action="{% url 'meet_step1' %}">
+        {% csrf_token %}
+    </form>-->
+    
+<section class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <figure class="my_schedule">
+                    <p><strong>{{ user.username }}</strong>&nbsp;님의 시간표
+                        <a class = "edit_button_1" href="{% url 'schedule' %}">수정</a>
+                        <input type="button" class="skip_button_1" value="skip">
+                        <div class="help-tip">
+                            <p>약속장소만 맞춰보고 싶을 때,<br> 나의 시간표 설정을 스킵하세요!</p>
+                        </div>
+                    </p><br> 
+                    {% if not schedules %}    
+                    <p class="not_yet">&nbsp;&nbsp;<span id="exclamation">!</span>&nbsp;&nbsp;아직 시간표가 입력되지 않았습니다.&nbsp;&nbsp;</p>
+                    {% endif %}
+                    <div class="schedule">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="time"></th>
+                                    <th class="day">월</th>
+                                    <th class="day">화</th>
+                                    <th class="day">수</th>
+                                    <th class="day">목</th>
+                                    <th class="day">금</th>
+                                    <th class="day">토</th>
+                                    <th class="day">일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--schedule에 있는 id와 달라야함-->
+                                <tr>
+                                    <th class="time" id="0900" rowspan="2">9</th>
+                                    <td id="u_MON0900"></td>
+                                    <td id="u_TUE0900"></td>
+                                    <td id="u_WED0900"></td>
+                                    <td id="u_THU0900"></td>
+                                    <td id="u_FRI0900"></td>
+                                    <td id="u_SAT0900"></td>
+                                    <td id="u_SUN0900"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON0930"></td>
+                                    <td id="u_TUE0930"></td>
+                                    <td id="u_WED0930"></td>
+                                    <td id="u_THU0930"></td>
+                                    <td id="u_FRI0930"></td>
+                                    <td id="u_SAT0930"></td>
+                                    <td id="u_SUN0930"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1000" rowspan="2">10</th>
+                                    <td id="u_MON1000"></td>
+                                    <td id="u_TUE1000"></td>
+                                    <td id="u_WED1000"></td>
+                                    <td id="u_THU1000"></td>
+                                    <td id="u_FRI1000"></td>
+                                    <td id="u_SAT1000"></td>
+                                    <td id="u_SUN1000"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1030"></td>
+                                    <td id="u_TUE1030"></td>
+                                    <td id="u_WED1030"></td>
+                                    <td id="u_THU1030"></td>
+                                    <td id="u_FRI1030"></td>
+                                    <td id="u_SAT1030"></td>
+                                    <td id="u_SUN1030"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1100" rowspan="2">11</th>
+                                    <td id="u_MON1100"></td>
+                                    <td id="u_TUE1100"></td>
+                                    <td id="u_WED1100"></td>
+                                    <td id="u_THU1100"></td>
+                                    <td id="u_FRI1100"></td>
+                                    <td id="u_SAT1100"></td>
+                                    <td id="u_SUN1100"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1130"></td>
+                                    <td id="u_TUE1130"></td>
+                                    <td id="u_WED1130"></td>
+                                    <td id="u_THU1130"></td>
+                                    <td id="u_FRI1130"></td>
+                                    <td id="u_SAT1130"></td>
+                                    <td id="u_SUN1130"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1200" rowspan="2">12</th>
+                                    <td id="u_MON1200"></td>
+                                    <td id="u_TUE1200"></td>
+                                    <td id="u_WED1200"></td>
+                                    <td id="u_THU1200"></td>
+                                    <td id="u_FRI1200"></td>
+                                    <td id="u_SAT1200"></td>
+                                    <td id="u_SUN1200"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1230"></td>
+                                    <td id="u_TUE1230"></td>
+                                    <td id="u_WED1230"></td>
+                                    <td id="u_THU1230"></td>
+                                    <td id="u_FRI1230"></td>
+                                    <td id="u_SAT1230"></td>
+                                    <td id="u_SUN1230"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1300" rowspan="2">1</th>
+                                    <td id="u_MON1300"></td>
+                                    <td id="u_TUE1300"></td>
+                                    <td id="u_WED1300"></td>
+                                    <td id="u_THU1300"></td>
+                                    <td id="u_FRI1300"></td>
+                                    <td id="u_SAT1300"></td>
+                                    <td id="u_SUN1300"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1330"></td>
+                                    <td id="u_TUE1330"></td>
+                                    <td id="u_WED1330"></td>
+                                    <td id="u_THU1330"></td>
+                                    <td id="u_FRI1330"></td>
+                                    <td id="u_SAT1330"></td>
+                                    <td id="u_SUN1330"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1400" rowspan="2">2</th>
+                                    <td id="u_MON1400"></td>
+                                    <td id="u_TUE1400"></td>
+                                    <td id="u_WED1400"></td>
+                                    <td id="u_THU1400"></td>
+                                    <td id="u_FRI1400"></td>
+                                    <td id="u_SAT1400"></td>
+                                    <td id="u_SUN1400"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1430"></td>
+                                    <td id="u_TUE1430"></td>
+                                    <td id="u_WED1430"></td>
+                                    <td id="u_THU1430"></td>
+                                    <td id="u_FRI1430"></td>
+                                    <td id="u_SAT1430"></td>
+                                    <td id="u_SUN1430"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1500" rowspan="2">3</th>
+                                    <td id="u_MON1500"></td>
+                                    <td id="u_TUE1500"></td>
+                                    <td id="u_WED1500"></td>
+                                    <td id="u_THU1500"></td>
+                                    <td id="u_FRI1500"></td>
+                                    <td id="u_SAT1500"></td>
+                                    <td id="u_SUN1500"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1530"></td>
+                                    <td id="u_TUE1530"></td>
+                                    <td id="u_WED1530"></td>
+                                    <td id="u_THU1530"></td>
+                                    <td id="u_FRI1530"></td>
+                                    <td id="u_SAT1530"></td>
+                                    <td id="u_SUN1530"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1600" rowspan="2">4</th>
+                                    <td id="u_MON1600"></td>
+                                    <td id="u_TUE1600"></td>
+                                    <td id="u_WED1600"></td>
+                                    <td id="u_THU1600"></td>
+                                    <td id="u_FRI1600"></td>
+                                    <td id="u_SAT1600"></td>
+                                    <td id="u_SUN1600"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1630"></td>
+                                    <td id="u_TUE1630"></td>
+                                    <td id="u_WED1630"></td>
+                                    <td id="u_THU1630"></td>
+                                    <td id="u_FRI1630"></td>
+                                    <td id="u_SAT1630"></td>
+                                    <td id="u_SUN1630"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1700" rowspan="2">5</th>
+                                    <td id="u_MON1700"></td>
+                                    <td id="u_TUE1700"></td>
+                                    <td id="u_WED1700"></td>
+                                    <td id="u_THU1700"></td>
+                                    <td id="u_FRI1700"></td>
+                                    <td id="u_SAT1700"></td>
+                                    <td id="u_SUN1700"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1730"></td>
+                                    <td id="u_TUE1730"></td>
+                                    <td id="u_WED1730"></td>
+                                    <td id="u_THU1730"></td>
+                                    <td id="u_FRI1730"></td>
+                                    <td id="u_SAT1730"></td>
+                                    <td id="u_SUN1730"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1800" rowspan="2">6</th>
+                                    <td id="u_MON1800"></td>
+                                    <td id="u_TUE1800"></td>
+                                    <td id="u_WED1800"></td>
+                                    <td id="u_THU1800"></td>
+                                    <td id="u_FRI1800"></td>
+                                    <td id="u_SAT1800"></td>
+                                    <td id="u_SUN1800"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1830"></td>
+                                    <td id="u_TUE1830"></td>
+                                    <td id="u_WED1830"></td>
+                                    <td id="u_THU1830"></td>
+                                    <td id="u_FRI1830"></td>
+                                    <td id="u_SAT1830"></td>
+                                    <td id="u_SUN1830"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="1900" rowspan="2">7</th>
+                                    <td id="u_MON1900"></td>
+                                    <td id="u_TUE1900"></td>
+                                    <td id="u_WED1900"></td>
+                                    <td id="u_THU1900"></td>
+                                    <td id="u_FRI1900"></td>
+                                    <td id="u_SAT1900"></td>
+                                    <td id="u_SUN1900"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON1930"></td>
+                                    <td id="u_TUE1930"></td>
+                                    <td id="u_WED1930"></td>
+                                    <td id="u_THU1930"></td>
+                                    <td id="u_FRI1930"></td>
+                                    <td id="u_SAT1930"></td>
+                                    <td id="u_SUN1930"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="2000" rowspan="2">8</th>
+                                    <td id="u_MON2000"></td>
+                                    <td id="u_TUE2000"></td>
+                                    <td id="u_WED2000"></td>
+                                    <td id="u_THU2000"></td>
+                                    <td id="u_FRI2000"></td>
+                                    <td id="u_SAT2000"></td>
+                                    <td id="u_SUN2000"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON2030"></td>
+                                    <td id="u_TUE2030"></td>
+                                    <td id="u_WED2030"></td>
+                                    <td id="u_THU2030"></td>
+                                    <td id="u_FRI2030"></td>
+                                    <td id="u_SAT2030"></td>
+                                    <td id="u_SUN2030"></td>
+                                </tr>
+                                <tr>
+                                    <th class="time" id="2100" rowspan="2">9</th>
+                                    <td id="u_MON2100"></td>
+                                    <td id="u_TUE2100"></td>
+                                    <td id="u_WED2100"></td>
+                                    <td id="u_THU2100"></td>
+                                    <td id="u_FRI2100"></td>
+                                    <td id="u_SAT2100"></td>
+                                    <td id="u_SUN2100"></td>
+                                </tr>
+                                <tr>
+                                    <td id="u_MON2130"></td>
+                                    <td id="u_TUE2130"></td>
+                                    <td id="u_WED2130"></td>
+                                    <td id="u_THU2130"></td>
+                                    <td id="u_FRI2130"></td>
+                                    <td id="u_SAT2130"></td>
+                                    <td id="u_SUN2130"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </figure>
+                <figure class="my_schedule_skipped" id="my_schedule_skipped">
+                    <p>&nbsp;> <strong>{{ user.username }}</strong>님의 <strong>시간표 설정</strong>을<br> 건너뛰었습니다.</p>
+                    <input type="button" class="cancel1" value="취소">
+                </figure>
+            </div>
+            <div class="col">
+                <figure class="my_location">
+                    <p><strong>{{ user.username }}</strong>&nbsp;님의 출발위치&nbsp;
+                        <a class = "edit_button_2" href="{% url 'location' %}">수정</a>
+                        <input type="button" class="skip_button_2" value="skip">
+                        <div class="help-tip">
+                            <p>약속시간만 맞춰보고 싶을 때,<br> 나의 출발위치 설정을 스킵하세요!</p>
+                        </div>
+                    </p>
+                    {% if not location %}    
+                    <p class="not_yet2">&nbsp;&nbsp;<span id="exclamation">!</span>&nbsp;&nbsp;아직 출발위치가 입력되지 않았습니다.&nbsp;&nbsp;</p>
+                    {% endif %}
+                    <!--location API 시작!-->
+                    <div id="location_body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div>
+                                <input id="address" name="address" type="text" value="{{ location.address }}" readonly="True">
+                                <input id="latitude" name="latitude" type="text" style="display: none;">
+                                <input id="longitude" name="longitude" type="text" style="display: none;">
+                            </div>
+                        </form>
+                
+                        <div id="map"></div>
+                    </div>
+                    <!--location API 끝!-->
+                </figure>
+                <figure class="my_location_skipped">
+                    <p>&nbsp;> <strong>{{ user.username }}</strong>님의 <strong>출발위치 설정</strong>을<br> 건너뛰었습니다.</p>
+                    <input type="button" class="cancel2" value="취소">
+                </figure>
+            </div>
+        </div>
+    </div> 
+    
+</section>
+</main>
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('step2').classList.add('active') 
+
+    function nolocation() {
+    {% if not location %}
+        alert("현재 출발위치를 설정하지 않아 LOCATION 페이지로 이동합니다.\n내가 어디에서 출발해 약속장소에 나갈지 입력해주세요😊");
+        window.location.href = "{% url 'location' %}";
+    {% else %}
+    window.location.href = "{% url 'meet_step3' %}";
+    {% endif %}
+    }
+
+    
+</script>
+
+
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+$( document ).ready( function() {
+    // 나의 시간표 스킵 시 나의 출발위치 스킵 불가
+    $(".skip_button_1").click(function(){
+        if($(".my_schedule").css("display") != "none"){
+            $(".my_schedule").hide();
+            $(".my_schedule_skipped").show();
+            alert('<STEP 2> 에서 \'나의 시간표 설정\'을 건너뛰었습니다.\n 따라서 <STEP3> 에서 \'그룹 시간표 확인\'도 건너뛰어집니다.')
+            $(".skip_button_2").attr('disabled', true);   
+
+            {% if not location %}
+            $('.next_button').show();
+            $(".next_button_1").hide();
+            $('.next_button_2').hide();
+
+            {% else %}
+            $('.next_button').hide();
+            $(".next_button_1").show();
+            $('.next_button_2').hide();
+            {% endif %}
+        }   
+    });
+} );
+
+$( document ).ready( function() {
+    // 나의 출발위치 스킵 시 나의 시간표 스킵 불가
+    $(".skip_button_2").click(function(){
+        if($(".my_location").css("display") != "none"){
+            $(".my_location").hide();
+            $(".my_location_skipped").show();
+            alert('<STEP 2> 에서 \'나의 출발위치 설정\'을 건너뛰었습니다.\n 따라서 <STEP3> 에서 \'그룹 출발위치 확인\'도 건너뛰어집니다.')
+            $(".skip_button_1").attr('disabled', true);
+            $('.next_button').hide();
+            $('.next_button_1').hide();
+            $(".next_button_2").show();
+        }
+    });
+} );
+
+$( document ).ready( function() {
+    // 나의 시간표 스킵을 취소한 후에는 나의 시간표, 나의 출발위치 둘 중 하나만 스킵 가능한 상태로 원상복구.
+    $(".cancel1").click(function(){
+        if($(".my_schedule_skipped").css("display") != "none"){
+            $(".my_schedule_skipped").hide();
+            $(".my_schedule").show();
+            $(".skip_button_1").attr('disabled', false);
+            $(".skip_button_2").attr('disabled', false);
+            $('.next_button').show();
+            $(".next_button_1").hide();
+            $('.next_button_2').hide();
+        }
+    });
+} );
+
+$( document ).ready( function() {
+    // 나의 출발위치 스킵을 취소한 후에는 나의 시간표, 나의 출발위치 둘 중 하나만 스킵 가능한 상태로 원상복구.
+    $(".cancel2").click(function(){
+        if($(".my_location_skipped").css("display") != "none"){
+            $(".my_location_skipped").hide();
+            $(".my_location").show();
+            $(".skip_button_1").attr('disabled', false);
+            $(".skip_button_2").attr('disabled', false);
+            $('.next_button').show();
+            $(".next_button_1").hide();
+            $('.next_button_2').hide();
+        }
+    });
+} );
+
+</script>
+
+<!--소은 location코드 복붙 시작!!-->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=83649d17ed6ffdbebc59d18cca995938&libraries=services"></script>
+<script>
+    //KAKAO API를 통해 지도 불러오기
+    var container = document.getElementById('map');
+	var options = {
+        center: new kakao.maps.LatLng("{{ location.latitude }}", "{{ location.longitude }}"),  //중심점
+        level: 3,    //줌 레벨
+    };
+	var map = new kakao.maps.Map(container, options);
+
+    // 지도에 확대 축소 컨트롤을 생성한다
+	var zoomControl = new kakao.maps.ZoomControl();
+
+    // 지도의 우측에 확대 축소 컨트롤을 추가한다
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+    //model에 저장된 사용자의 위치를 마커로 표시
+    marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng("{{ location.latitude }}", "{{ location.longitude }}"),
+        image: new kakao.maps.MarkerImage("{% static 'images/marker_icon.png' %}", new kakao.maps.Size(31, 35), new kakao.maps.Point(13, 34)),
+    });
+    marker.setMap(map);
+
+    //지도 클릭 이벤트
+    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+        var geocoder = new kakao.maps.services.Geocoder();  //주소-좌표 변환 객체 생성
+        geocoder.coord2Address(mouseEvent.latLng.getLng(), mouseEvent.latLng.getLat(), function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var detailAddr = !!result[0].road_address ? result[0].road_address.address_name : '';   //도로명 주소
+                if (detailAddr == '') detailAddr += result[0].address.address_name; //도로명 주소가 없다면 지번 주소를 가져옴
+
+                document.getElementById("address").value = detailAddr; //form에 주소 저장
+                setFormLatLng(mouseEvent.latLng.getLat(), mouseEvent.latLng.getLng());  //form에 위도경도 저장
+                marker.setPosition(mouseEvent.latLng);    //마커를 클릭한 위치에 표시
+            }   
+        });
+    });
+
+    //지도의 중심점을 변경하는 함수
+    function changePoint(lat, long) {
+        map.setCenter(new kakao.maps.LatLng(lat, long));
+        map.setLevel(3);
+    }
+
+    //마커의 위치를 변경하는 함수
+    function changeMarker(lat, long) {
+        marker.setPosition(new kakao.maps.LatLng(lat, long));
+    }
+
+    //좌표-주소 변환하고 form에 주소를 저장하는 함수
+    function getAddress(lat, long) {
+        var geocoder = new kakao.maps.services.Geocoder();  //주소-좌표 변환 객체 생성
+        geocoder.coord2Address(long, lat, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var detailAddr = !!result[0].road_address ? result[0].road_address.address_name : '';   //도로명 주소
+                if (detailAddr == '') detailAddr += result[0].address.address_name; //도로명 주소가 없다면 지번 주소를 가져옴
+
+                document.getElementById("address").value = detailAddr; //form에 주소 저장
+            }
+        })
+    }
+
+    function getGeofromAddress(address) {
+        var geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                changePoint(result[0].y, result[0].x);  //지도의 중심 옮기기
+                changeMarker(result[0].y, result[0].x); //마커 옮기기
+                setFormLatLng(result[0].y, result[0].x);//form에 저장
+            }
+        });
+    }
+
+    //form의 latitude와 longitude에 값을 저장하는 함수
+    function setFormLatLng(lat, long) {
+        document.getElementById("latitude").value = lat; //form에 latitude 저장
+        document.getElementById("longitude").value = long;//form에 longitude 저장
+    }
+</script>
+
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    function getPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById("address").value = data.address;    //form에 주소 저장
+                getGeofromAddress(data.address);    //주소를 통해 위도경도 구하기
+            }
+        }).open({
+            q: document.getElementById("location_keyword").value
+        });
+    }
+</script>
+<script type="text/javascript">
+    function loadCoords() {
+        const loadedCoords = localStorage.getItem("coords");
+        //현재 위치 값을 받아옴
+        navigator.geolocation.getCurrentPosition(handleGeoSuccess, handleGeoError);
+    }
+
+    //GPS 값을 받아오는 것에 성공했을 경우 실행되는 함수
+    function handleGeoSuccess(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const coordsObj = {
+            latitude,
+            longitude
+        };
+        
+        localStorage.setItem("coords", JSON.stringify(coordsObj));
+        changeMarker(latitude, longitude);  //지도에 현재 위치 마커 표시하기
+        changePoint(latitude, longitude);   //지도의 중심점을 현재 위치로 바꾸기
+        setFormLatLng(latitude, longitude);     //form에 위도경도 저장
+        getAddress(latitude, longitude);    //form에 주소 저장
+    }
+
+    function handleGeoError() {
+        console.log("Can't access geo location");
+    }
+</script>
+<!--소은 location코드 복붙 끝!!-->
+{% endblock %}

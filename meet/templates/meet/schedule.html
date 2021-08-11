@@ -1,0 +1,881 @@
+<!--TODO:8시랑 22시에 시간표 추가 안되도록 해야 함-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    #left_frame {
+        height: 130%;
+    }
+
+    /* main */
+    main {
+        padding-top: 30px;
+        margin-left: 350px; /* (#left_frame의 width) + 20px */
+    }
+    main button:hover {
+        background-color: rgba(142,68,173,0.8);
+        border-color: rgba(142,68,173);
+    }
+    main button.reverse {
+        color: #8E44AD;
+        background-color: #fff;
+        border: 1px solid #8E44AD;
+    }
+    main button.reverse:hover {
+        color: #542E86;
+        background-color: rgba(142,68,173,0.1);
+        border: 1px solid #542E86;
+    }
+    main .display_none {
+        display: none;
+    }
+
+    /* header */
+    #header {
+        margin-bottom:30px;
+    }
+    #header #choose_menu {
+        margin-right: 10%;
+    }
+    #header #choose_menu .show_pick {
+        display: inline-block;
+        margin-right: 15px;
+        vertical-align: sub;
+    }
+    #header #choose_menu .explain {
+        margin-top: 10px;
+    }
+    #header #choose_menu .block {
+        display: block;
+        font-size: 9pt;
+    }
+    #header #choose_menu #choose_cant_meet {
+        padding: 5 10 5 10;
+        color:white;
+        background-color:#FF8683;
+        border-radius: 4px;
+        border: 1px solid #707070;
+    }
+    #header #choose_menu #choose_can_meet {
+        padding: 5 10 5 10;
+        color:white;
+        background-color:#62D77D;
+        border-radius: 4px;
+        border: 1px solid #707070;
+    }
+    #header #choose_menu button {
+        vertical-align: top;
+    }
+
+    /* schedule table */
+    #schedule_table {
+        width: 85%;
+        margin-left: 50px;
+        table-layout: fixed;
+        border-spacing: 0;
+        margin-bottom: 30px;
+        font-size: 9pt;
+        color: white;
+    }
+    #schedule_table th, #schedule_table td {
+        width: 120px;
+        padding: .75rem;
+        border-left: 1px solid #E2D7F1;
+    }
+    #schedule_table thead th, #schedule_table thead .time {
+        color: #212529;
+        border-top: 1px solid #E2D7F1;
+        border-bottom: 2px solid #E2D7F1;
+    }
+    #schedule_table .day {
+        text-align: center;
+        font-size: 10pt;
+    }
+    #schedule_table .time {
+        border-left: none;
+        width: 70px;
+        vertical-align: middle;
+        padding-top: 1.2rem;
+        border: none; 
+        color: #B4A4CA;
+        font-size: 10pt;
+    }
+    #schedule_table .oclock {
+        border-bottom: 1px dashed #E2D7F1;
+    }
+    #schedule_table .half {
+        border-bottom: 1px solid #E2D7F1;
+    }
+    #schedule_table .today {
+        background-color: #F9F5FF;
+    }
+    #schedule_table .X {    /* 약속 불가 셀 */
+        border-bottom: none;
+        background-color: #FF8683;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+    #schedule_table .O {    /* 약속 선호 셀 */
+        border-bottom: none;
+        background-color: #62D77D;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+    #schedule_table .start {    /* 스케줄 첫 셀 */
+        border-top-left-radius: 13px;
+        border-top-right-radius: 13px;
+    }
+    #schedule_table .X.start {  /* 스케줄 첫 셀(약속 불가) */
+        background-color: #E57876;
+    }
+    #schedule_table .O.start {  /* 스케줄 첫 셀(약속 선호) */
+        background-color: #57C070;
+    }
+    #schedule_table .end {  /* 스케줄 마지막 셀 */
+        border-bottom-left-radius: 13px;
+        border-bottom-right-radius: 13px;
+    }
+    #schedule_table td img {
+        height: 15px;
+    }
+    #schedule_table.red_clickable td {   /* choiceType=1(=약속 불가)일 때 스케줄 없는 td */
+        cursor: url('{% static "images/brush_red.png" %}'),auto;
+    }
+    #schedule_table.green_clickable td {   /* choiceType=2(=약속 선호)일 때 스케줄 없는 td */
+        cursor: url('{% static "images/brush_green.png" %}'),auto;
+    }
+    #schedule_table.red_clickable .O, #schedule_table.red_clickable .X, #schedule_table.green_clickable .O, #schedule_table.green_clickable .X {   /* choiceType이 있을 때 스케줄 있는 td */
+        cursor: not-allowed;
+    }
+    #schedule_table.red_clickable .red_changed {  /* choiceType=1(=약속 불가)일 때 셀을 클릭한 경우 */
+        background-color: #FF8683;
+    }
+    #schedule_table.green_clickable .green_changed {    /* choiceType=2(=약속 선호)일 때 셀을 클릭한 경우 */
+        background-color: #62D77D;
+    }
+    #schedule_table .padding0 {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    
+    /* 모달창 */
+    #schedule_choose_modal {
+        display: none;
+        width: 800px;
+        height: 530px;
+        padding:80 70 50 70;
+        border-radius: 30px;
+        background-color: #fff;
+    }
+    #schedule_choose_modal .modal_close_btn {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+    }
+    #schedule_choose_modal .modal_close_btn img {
+        width: 20px;
+    }
+    #schedule_choose_modal #schedule_type, #schedule_choose_modal #schedule_description {
+        margin-bottom: 40px;
+    }
+    #schedule_choose_modal p { /* 질문 text */
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    #schedule_choose_modal #type_section {  /* 유형 선택 영역 */
+        width: 585px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #schedule_choose_modal .choose_item {   /* 각각의 유형 버튼 */
+        display: inline-block;
+        width: 250px;
+        margin: 0 20 0 20;
+        padding: 15 40 15 40;
+        border-radius: 25px;
+        border: 2px solid gray;
+    }
+    #schedule_choose_modal #cant_meet_btn {  /* 약속 불가: 비활성화일 경우 */
+        border-color: #FF8683;
+        color: #ACACAC;
+    }
+    #schedule_choose_modal #can_meet_btn {  /* 약속 선호: 비활성화일 경우 */
+        border-color: #57C070;
+        color: #ACACAC;
+    }
+    #schedule_choose_modal #cant_meet_btn.active {  /* 약속 불가: 활성화일 경우 */
+        border-color: #FF8683;
+        background-color: #FF8683;
+        color: #fff;
+    }
+    #schedule_choose_modal #can_meet_btn.active {  /* 약속 선호: 활성화일 경우 */
+        border-color: #57C070;
+        background-color: #57C070;
+        color: #fff;
+    }
+    #schedule_choose_modal .title { /* 유형 버튼 안의 제목 */
+        display: block;
+        padding: 10px;
+        text-align: center;
+        font-family: 'Cafe24Ssurround';
+        font-size: 18pt;
+    }
+    #schedule_choose_modal .sub {   /* 유형 버튼 안의 설명글 */
+        display: block;
+        padding: 10px;
+        text-align: center;
+        font-size: 9pt;
+    }
+    #schedule_choose_modal input[type="text"] {   /* text input */
+        font-size: 11pt;
+        padding: 1.4rem 1rem;
+        color: black;
+    }
+
+    .choice .not-allowed {
+        cursor: not-allowed !important;
+    }
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <!--스케줄 유형 선택하는 모달창-->
+    <div id="schedule_choose_modal">
+        <a class="modal_close_btn"><img src="{% static 'images/close.png' %}"/></a>
+
+        <form id="schedule_choose_form" method="POST">
+            {% csrf_token %}
+            <div id="schedule_type">
+                <p>1. 어떤 유형의 스케줄을 추가할까요?</p>
+                <div id="type_section">
+                    <div id="cant_meet_btn" class="choose_item">
+                        <input id="cant_meet_input" name="cant_meet" type="text" value="none" style="display: none;"/>    <!--폼에 값을 넣기 위한 용도-->
+                        <span class="title">약속 불가</span>
+                        <span class="sub">약속을 잡을 수 없어요!🤨</span>
+                    </div>
+                    <div id="can_meet_btn" class="choose_item">
+                        <input id="can_meet_input" name="can_meet" type="text" value="none" style="display: none;"/>     <!--폼에 값을 넣기 위한 용도-->
+                        <span class="title">약속 선호</span>
+                        <span class="sub">이때 약속을 잡고 싶어요!😊</span>
+                    </div>
+                </div> 
+            </div>
+
+            <div id="schedule_description">
+                <p>2. 스케줄 정보를 적어놓고 싶다면 이곳에 적어주세요! </p>
+                <input name="description" class="form-control" type="text" placeholder="생략도 가능해요 :) (10자 이내로 적어주세요.)"/>
+            </div>
+            <div class="d-md-flex justify-content-md-end">
+                <button id="choose_submit_btn" type="submit" class="reverse">OK</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="header" class="d-flex justify-content-between">
+        <div>
+            <img class="icon" src="{% static 'images/schedule_setting_icon.png' %}"/>
+            <span>스케줄 관리</span>
+        </div>
+        <!--사용자가 유형을 선택했을 때 보여질 header-->
+        <div id="choose_menu">
+            <div class="show_pick">
+                {% if choiceType == 1 %}
+                <div class="block">
+                    <span>선택한 유형:</span>
+                    <span id="choose_cant_meet">약속 불가</span>
+                </div>
+                <div class="block explain">
+                    <span>원하는 영역을 클릭해주세요.</span>
+                </div>
+                {% elif choiceType == 2 %}
+                <div class="block">
+                    <span>선택한 유형:</span>
+                    <span id="choose_can_meet">약속 선호</span>
+                </div>
+                <div class="block explain">
+                    <span>원하는 영역을 클릭해주세요.</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if choiceType == null %}
+            <button id="add_schedule_btn">스케줄 추가</button>
+            {% endif %}
+            {% if choiceType == 1 or choiceType == 2%}
+            <button id="save_btn">저장</button>
+            <a href="{% url 'schedule' %}"><button id="cancel_btn" class="reverse">취소</button></a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if choiceType == 1 or choiceType == 2 %}
+    <div class="choice">
+    {% else %}
+    <div>
+    {% endif %}
+        <table id="schedule_table">
+            <thead>
+                <tr>
+                    <th class="time"></th>
+                    <th class="day">Monday</th>
+                    <th class="day">Tuesday</th>
+                    <th class="day">Wednesday</th>
+                    <th class="day">Thursday</th>
+                    <th class="day">Friday</th>
+                    <th class="day">Saturday</th>
+                    <th class="day">Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="time" id="0830" rowspan="2">9 AM</th>
+                    <td id="MON0830" class="half not-allowed"></td>
+                    <td id="TUE0830" class="half not-allowed"></td>
+                    <td id="WED0830" class="half not-allowed"></td>
+                    <td id="THU0830" class="half not-allowed"></td>
+                    <td id="FRI0830" class="half not-allowed"></td>
+                    <td id="SAT0830" class="half not-allowed"></td>
+                    <td id="SUN0830" class="half not-allowed"></td>
+                </tr>
+                <tr>
+                    <td id="MON0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN0900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1000" rowspan="2">10 AM</th>
+                    <td id="MON0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN0930" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    
+                    <td id="MON1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+
+                <tr>
+                    <th class="time" id="1100" rowspan="2">11 AM</th>
+                    <td id="MON1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1030" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <td id="MON1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1130" rowspan="2">12 PM</th>
+                    <td id="MON1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1130" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>            
+                <tr>
+                    <td id="MON1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1200" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1230" rowspan="2">1 PM</th>
+                    <td id="MON1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1230" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>            
+                <tr>
+                    <td id="MON1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1300" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1330" rowspan="2">2 PM</th>
+                    <td id="MON1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1330" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1400" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1430" rowspan="2">3 PM</th>
+                    <td id="MON1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1430" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1500" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1530" rowspan="2">4 PM</th>
+                    <td id="MON1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1530" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1600" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1630" rowspan="2">5 PM</th>
+                    <td id="MON1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1630" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1700" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1730" rowspan="2">6 PM</th>
+                    <td id="MON1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1730" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1800" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1830" rowspan="2">7 PM</th>
+                    <td id="MON1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1830" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1900" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="1930" rowspan="2">8 PM</th>
+                    <td id="MON1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN1930" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN2000" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="2030" rowspan="2">9 PM</th>
+                    <td id="MON2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN2030" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN2100" class="oclock" onclick="schedule_state_change(this.id);"></td>
+                </tr>
+                <tr>
+                    <th class="time" id="2130" rowspan="2">10 PM</th>
+                    <td id="MON2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="TUE2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="WED2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="THU2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="FRI2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SAT2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                    <td id="SUN2130" class="half" onclick="schedule_state_change(this.id);"></td>
+                </tr>           
+                <tr>
+                    <td id="MON2200" class="not-allowed"></td>
+                    <td id="TUE2200" class="not-allowed"></td>
+                    <td id="WED2200" class="not-allowed"></td>
+                    <td id="THU2200" class="not-allowed"></td>
+                    <td id="FRI2200" class="not-allowed"></td>
+                    <td id="SAT2200" class="not-allowed"></td>
+                    <td id="SUN2200" class="not-allowed"></td>
+                </tr>
+            </tbody>
+        </table>
+        <form id="changed_form" method="POST">
+            {% csrf_token %}
+            <input id="red_changed" name="red_changed" value="" type="text" style="display: none;"/>
+            <input id="red_alias" name="red_alias" value="" type="text" style="display: none;"/>
+            <input id="green_changed" name="green_changed" value="" type="text" style="display: none;"/>
+            <input id="green_alias" name="green_alias" value="" type="text" style="display: none;"/>
+            <input id="empty_changed" name="empty_changed" value="" type="text" style="display: none;"/>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+
+    function next_time(time) {   //다음 시간 만들어내는 함수 (ex.0900->0930)
+        if (time.charAt(2)=='0') {  //정각이라면, 
+            time = time.replaceAt(2,'3');  //30분으로 만듦
+        }
+        else {  //half라면,
+            time = time.replaceAt(2,'0');  //00분으로 만듦
+            var integer_time = parseInt(time.substring(0,2)) + 1;   //시간 + 1
+            if (integer_time < 10) integer_time = '0'+integer_time; //두 자리 수로 만듦
+            time = time.replaceAt(0, integer_time.toString());
+        }
+        return time;
+    }
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+    }
+
+    function show_today() { //오늘 요일 스케줄에 나타내기
+        var d = new Date();
+        var week = new Array('SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT');
+        var day = week[d.getDay()]; //현재 요일 가져오기
+        var time = "0830";
+
+        //2230이 될 때까지 while문 반복
+        while(time != "2230") {
+            document.getElementById(day + time).classList.add('today');
+            time = next_time(time);  //다음 id 문자열 만들기
+        }
+    }
+
+    function show_schedule() {  //사용자 스케줄 나타내기
+        var prev_day = "";
+        var prev_time = "";
+        var prev_value = "";
+        var prev_alias = "";
+
+        {% for schedule in schedules %}    
+            if ("{{ schedule.value }}" == "1") {    //약속 선호 유형이면 "O" 클래스에 추가
+                document.getElementById("{{ schedule.day }}" + "{{ schedule.time }}").classList.add('O');
+            }
+            else if ("{{ schedule.value }}" == "-1") {  //약속 불가 유형이면 "X" 클래스에 추가
+                document.getElementById("{{ schedule.day }}" + "{{ schedule.time }}").classList.add('X');
+            }
+            
+            //현재 스케줄이 이전 스케줄의 연속이 아니거나, 별칭이 다르다면 prev는 end로, schedule은 start로 설정함
+            if (("{{ schedule.day }}" != prev_day) || ("{{ schedule.time }}" != next_time(prev_time)) || ("{{ schedule.alias }}" != prev_alias)) {
+                document.getElementById("{{ schedule.day }}" + "{{ schedule.time }}").classList.add('start');   //schedule에는 start 표시
+
+                if ("{{ schedule.value }}" == "1")      //약속 선호 유형이면 "약속 선호" 표시
+                    document.getElementById("{{ schedule.day }}" + "{{ schedule.time }}").innerText = "약속 선호";
+                else if ("{{ schedule.value }}" == "-1")     //약속 불가 유형이면 "약속 불가" 표시
+                    document.getElementById("{{ schedule.day }}" + "{{ schedule.time }}").innerText = "약속 불가";
+
+
+                if ("{{ schedule.alias }}" != "" && "{{ schedule.alias }}" != "None") {   //별칭이 있으면 시작 다음 시간에 표시
+                    document.getElementById("{{ schedule.day }}" + next_time("{{ schedule.time }}")).innerText = "{{ schedule.alias }}";
+                    document.getElementById("{{ schedule.day }}" + next_time("{{ schedule.time }}")).classList.add("padding0");
+                }
+                if (prev_day != "") //prev가 있었다면,
+                    document.getElementById(prev_day + prev_time).classList.add('end'); //prev에는 end 표시
+            }
+
+            //이전 데이터 가지고 있음
+            prev_day = "{{schedule.day}}";
+            prev_time = "{{schedule.time}}";
+            prev_value = "{{schedule.value}}";
+            prev_alias = "{{schedule.alias}}";
+        {% endfor %}
+
+        document.getElementById(prev_day + prev_time).classList.add('end'); //제일 마지막 요소에 end 표시
+    }
+
+    function is_next(time1, time2) {
+        //다음 문자열 만들기
+        if (time2.charAt(2)=='0') {  //정각이라면, 
+            time2 = time2.replaceAt(2,'3');  //30분으로 만듦
+        }
+        else {  //half라면,
+            time2 = time2.replaceAt(2,'0');  //00분으로 만듦
+            var integer_time = parseInt(time2.substring(0,2)) + 1;   //시간 + 1
+            if (integer_time < 10) integer_time = '0'+integer_time; //두 자리 수로 만듦
+            time2 = time2.replaceAt(0, integer_time.toString());
+        }
+    }
+    //"스케줄 추가"를 클릭하면 모달창을 띄워주는 함수
+    function show_modal(id) {
+        var zIndex = 9999;  //제일 맨 앞에 보여주기 위해 zIndex를 큰 값으로 설정 
+        var modal = document.getElementById(id);    //해당 id에 대한 객체를 modal로 설정
+
+        //모달창을 제외한 배경을 어둡게
+        var bg = document.createElement('div')
+        bg.setStyle({
+            position: 'fixed',
+            zIndex: zIndex,
+            left: '0px',
+            top: '0px',
+            width: '100%',
+            height: '100%',
+            overflow: 'auto',
+            backgroundColor: 'rgba(0,0,0,0.45)'
+        });
+        document.body.append(bg);
+
+        //닫기 버튼 이벤트
+        modal.querySelector('.modal_close_btn').addEventListener('click', function() {
+            bg.remove();                    //배경색 제거
+            modal.style.display = 'none';   //모달창 안보이도록 none 처리
+        });
+
+        //약속 불가 버튼 이벤트
+        modal.querySelector('#cant_meet_btn').addEventListener('click', function() {
+            document.getElementById('cant_meet_input').value = "active";        //약속 불가 input 값 ="active"
+            document.getElementById('can_meet_input').value = "none";           //약속 선호 input 값 ="none"
+            document.getElementById('cant_meet_btn').classList.add('active');   //약속 불가 버튼은 활성화
+            document.getElementById('can_meet_btn').classList.remove('active'); //약속 선호 버튼은 비활성화
+        });
+
+        //약속 선호 버튼 이벤트
+        modal.querySelector('#can_meet_btn').addEventListener('click', function() {
+            document.getElementById('can_meet_input').value = "active";         //약속 선호 input 값 ="active"
+            document.getElementById('cant_meet_input').value = "none";          //약속 불가 input 값 ="none"
+            document.getElementById('can_meet_btn').classList.add('active');    //약속 선호 버튼은 활성화
+            document.getElementById('cant_meet_btn').classList.remove('active');//약속 불가 버튼은 비활성화
+        });
+
+        //모달창 보이도록 css 변경
+        modal.setStyle({
+            position: 'fixed',
+            display: 'block',
+            zIndex: zIndex + 1, // 어두운 배경 위에 쌓이도록
+
+            // 화면 중앙에 정렬
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            msTransform: 'translate(-50%, -50%)',
+            webkitTransform: 'translate(-50%, -50%)'
+        });
+    }
+
+    function delete_schedule(cell_id) { //ex)MON0900
+        if (confirm("정말 삭제하시겠습니까?")) {    //confirm 창을 통해 재확인
+            var day = cell_id.toString().substring(0,3);    //ex)MON
+            var time = cell_id.toString().substring(3,7);   //ex)0900
+
+            var delete_cells = [];  //delete_cells: delete 해야 할 셀의 id 배열
+            var id = cell_id;       //id: while문을 통해 수사할 id
+            delete_cells.push(id);  //시작 셀의 id 추가
+
+            //end가 적힌 cell 찾을 때까지 delete_cells에 추가
+            while(!document.getElementById(id).classList.contains("end")) {
+                //다음 id 문자열 만들기
+                if (time.charAt(2)=='0') {  //정각이라면, 
+                    time = time.replaceAt(2,'3');  //30분으로 만듦
+                }
+                else {  //half라면,
+                    time = time.replaceAt(2,'0');  //00분으로 만듦
+                    var integer_time = parseInt(time.substring(0,2)) + 1;   //시간 + 1
+                    if (integer_time < 10) integer_time = '0'+integer_time;                //두 자리 수로 만듦
+                    time = time.replaceAt(0, integer_time.toString());
+                }
+                id = day + time;
+                delete_cells.push(id);  //수사한 id를 delete_cells 배열에 추가
+            }
+            
+            //delete_cells에 적힌 셀들의 스케줄을 삭제
+            for (cell of delete_cells) {
+                document.getElementById('empty_changed').value += cell + ",";
+            }
+            document.getElementById('changed_form').action = "{% url 'deleteSchedule' %}";  //action change
+            document.getElementById('changed_form').submit();   
+        }
+    }
+
+    String.prototype.replaceAt = function(index, replacement) {
+        return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+    }
+    
+    //Element에 style을 한번에 설정하는 함수
+    Element.prototype.setStyle = function(styles) {
+        for(var k in styles) this.style[k] = styles[k];
+        return this;
+    };
+
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('nav_schedule').classList.add('active');
+
+    //"스케줄 추가" 버튼 이벤트
+    if (document.getElementById('add_schedule_btn')) {
+        document.getElementById('add_schedule_btn').addEventListener('click', function() {
+            show_modal('schedule_choose_modal');
+        });
+    }
+    
+    //"저장" 버튼 이벤트-table 폼 제출
+    if (document.getElementById("save_btn")) {
+        document.getElementById("save_btn").addEventListener('click', function() {
+            var red_changed_cells = document.getElementsByClassName('red_changed');  //약속 불가로 변경된 객체들
+            var green_changed_cells = document.getElementsByClassName('green_changed');  //약속 선호로 변경된 객체들
+            if (red_changed_cells.length != 0) {   
+                for (cell of red_changed_cells) {
+                    document.getElementById('red_changed').value += cell.id + ",";
+                }
+                document.getElementById('red_alias').value = "{{ description }}";
+                document.getElementById('changed_form').action = "{% url 'addDislikeSchedule' %}";  //action change
+            }
+            else if (green_changed_cells != 0) {
+                for (cell of green_changed_cells) {
+                    document.getElementById('green_changed').value += cell.id + ",";
+                }
+                document.getElementById('green_alias').value = "{{ description }}";
+                document.getElementById('changed_form').action = "{% url 'addLikeSchedule' %}";  //action change
+            }
+        
+            document.getElementById('changed_form').submit();
+        });
+    }
+
+    show_today();   //오늘에 해당하는 요일 표시하기
+    show_schedule();    //스케줄 표시하기
+</script>
+
+{% if choiceType == 1 %}    <!--사용자가 약속 불가 유형을 선택했을 때 js-->
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('schedule_table').classList.add('red_clickable');
+
+    //셀을 클릭하면 빨간색 배경으로 바꿔주는 함수
+    function schedule_state_change(id){
+        //이미 스케줄이 있으면 행동X
+        if (document.getElementById(id).classList.contains('O') || document.getElementById(id).classList.contains('X')) return;
+
+        document.getElementById(id).classList.toggle('red_changed');    //해당 셀이 변경되었다고 표시
+    }
+</script>
+{% elif choiceType == 2 %}  <!--사용자가 약속 선호 유형을 선택했을 때 js-->
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('schedule_table').classList.add('green_clickable');
+
+    //셀을 클릭하면 빨간색 배경으로 바꿔주는 함수
+    function schedule_state_change(id){
+        //이미 스케줄이 있으면 행동X
+        if (document.getElementById(id).classList.contains('O') || document.getElementById(id).classList.contains('X')) return;
+        document.getElementById(id).classList.toggle('green_changed');    //해당 셀이 변경되었다고 표시
+    }
+</script>
+{% else %}
+<script type="text/javascript">
+    //형식상 만든 함수
+    function schedule_state_change(id){
+        return
+    }
+
+    //각 스케줄에 삭제 버튼 추가
+    schedules = document.getElementsByClassName("start");
+    for (var i=0; i<schedules.length; i++) {
+        if (schedules[i].classList.contains("X")) 
+            schedules[i].innerHTML="<div class='d-flex justify-content-between'><span>약속 불가</span><img style='cursor:pointer' src='{% static 'images/delete.png' %}' onclick='delete_schedule(this.parentNode.parentNode.id);'/></div>";
+        else if (schedules[i].classList.contains("O")) 
+        schedules[i].innerHTML="<div class='d-flex justify-content-between'><span>약속 선호</span><img style='cursor:pointer' src='{% static 'images/delete.png' %}' onclick='delete_schedule(this.parentNode.parentNode.id);'/></div>";
+    }
+</script>
+{% endif %}
+{% endblock %}

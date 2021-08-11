@@ -1,0 +1,974 @@
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Meet Wizard</title>
+        <link rel="shortcut icon" type="image⁄x-icon" href="{% static 'images/logo_icon.png' %}">
+
+        <style type="text/css">
+            @font-face {
+                font-family: 'HeirofLightBold';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/HeirofLightBold.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+            }
+            @font-face {
+                font-family: 'Cafe24SsurroundAir';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24SsurroundAir.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+            }
+            @font-face {
+                font-family: 'Cafe24Ssurround';
+                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+            }
+
+            body {
+                font-family: 'Cafe24SsurroundAir';
+            }
+            button {
+                display: inline-block;
+                background-color: rgba(142,68,173);
+                color: #fff;
+                border-radius: .25rem;
+                border: none;
+                padding: .375rem .75rem;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+            .frame {
+                box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.161);
+            }
+            .logo {
+                font-family: 'HeirofLightBold';
+                font-size: 2.3rem;
+                padding: 20px;
+            }
+            .icon {
+                width: 20px;
+                margin-left: 2.5px;
+                margin-right: 2.5px;
+                text-decoration: none;
+            }
+            .icon:hover{
+                cursor:pointer;
+            }
+            span#login, span#signup, span#logout2, span#setting {
+                font-size: 2px;
+                color: black;
+                text-align: center;
+                text-decoration: none;
+                margin-top: 2px;
+            }
+            .align_right {
+                position: absolute;
+                right: 10px;
+                text-decoration: none;
+            }
+            .frame {
+                box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.161);
+            }
+            /* 상단 메뉴바 */
+            #top_frame .navbar-expand-lg .navbar-nav .nav-link {
+                padding-right: 4.3rem;
+                padding-left: 4.3rem;
+            }
+            #top_frame #navbar {
+                margin-left: 30px;
+            }
+            #top_frame #navbar ul {
+                height: 40px;
+            }
+            #top_frame #meet_button {
+                margin-top: -10px;
+                padding: 10 20 10 20;
+                color: #ffffff;
+                background-color: #8E44AD;
+                border-radius: 5px;
+                border: 0;
+                outline: 0;
+            }
+            #top_frame .navbar-light .navbar-nav .active>.nav-link, 
+            #top_frame .navbar-light .navbar-nav .nav-link.active, 
+            #top_frame .navbar-light .navbar-nav .nav-link.show,
+            #top_frame .navbar-light .navbar-nav .show>.nav-link { /* 메뉴 활성화 */
+                font-family: 'Cafe24Ssurround';
+                color:#8E44AD; 
+            }
+
+            /* 왼쪽 고정바 */
+            #left_frame {
+                position: relative;
+                width: 330px;
+                height: 100%;
+                float: left;
+                padding: 50 10 0 10;
+                margin-right: 10px;
+            }
+            #left_frame .profile, 
+            #left_frame .location {
+                padding-bottom: 40px;
+            }
+            /* 왼쪽 고정바-프로필 */
+            #left_frame .profile .profile_img {
+                width: 40px;
+                padding: 3;
+                border: 1px solid #888;
+                border-radius: 40%;
+                object-fit: cover;
+            }
+            #left_frame .profile .profile_img.default {
+                width: 30px;
+                padding: 5;
+                border-radius: 40%;
+                object-fit: cover;
+            }
+            #left_frame .profile .welcome {
+                font-size: 11pt;
+                padding-left: 3;
+            }
+            #left_frame .profile .icons {
+                margin-top: 7;
+            }
+            /* 왼쪽 고정바-사용자 위치 */
+            #left_frame .location .location_text {
+                width: 260px;
+                font-size: 9pt;
+                display: inline-block;
+            }
+            #left_frame .location .hr {
+                margin-left: 30px;
+                background-color: black;
+                width: 260px;
+                height: 1px;
+            }
+            /* 왼쪽 고정바-사용자 스케줄 */
+            #left_frame .schedule.nonmember {
+                position: relative;
+            }
+            #left_frame .schedule.nonmember .disabled {
+                position: absolute;
+                margin: 15 25;
+                width: 83%;
+                height: 285;
+                background-color: rgba(230, 230, 230, 0.85);
+                z-index: 999;
+                border-radius: 10px;
+            }
+            #left_frame .schedule.nonmember .notice {
+                position: absolute;
+                top: 130;
+                margin-left: 30px;
+                width: 80%;
+                text-align: center;
+                font-size: 0.85rem;
+                z-index: 999;
+            }
+            #left_frame .schedule table {
+                margin-left: 30px;
+                width: 80%;
+            }
+            #left_frame .schedule table th,
+            #left_frame .schedule table td {
+                font-size: 0.8rem;
+                text-align-last: center;
+                border-left: 1px solid #E2D7F1;
+                border-bottom: 1px solid #E2D7F1;
+            }
+            #left_frame .schedule thead th {
+                border-top: 1px solid #E2D7F1;
+                border-bottom: 1.5px solid #E2D7F1;
+            }
+            #left_frame .schedule .time {
+                border-left: none;
+            }
+            #left_frame .schedule .X {
+                background-color:#FF8683;
+                border-bottom: none;
+            }
+            #left_frame .schedule .O {
+                background-color:#62D77D;
+                border-bottom: none;
+            }
+            /* 왼쪽 고정바-STEP */
+            #left_frame .step {
+                border: 0;
+                outline: 0;
+                border-radius: 10px; 
+                background-color: #FAF5FD;
+                padding: 15px;
+                margin: 12px;
+                margin-left: 45px;
+                margin-bottom: 25px;
+                width: 210px;
+                height: auto;
+            }
+            #left_frame .step_title {
+                font-family: 'Cafe24Ssurround';
+                text-align: center;
+                font-size: 0.9rem;
+            }
+            #left_frame .step_description {
+                text-align: center;
+                font-size: 0.8rem;
+                margin-bottom: 0;
+            }
+            #left_frame .step.active{
+                background-color: #E3C0F1;
+            }
+
+            /* footer */
+            footer {
+                background-color: #542E86;
+                padding-top: 30px; 
+                padding-bottom: 30px;
+                clear: left;
+            }
+            footer table {
+                color: white; 
+                font-size: 9pt;
+                margin-left: auto; 
+                margin-right: auto;
+                border-collapse: collapse;
+            }
+            footer table .logo {
+                width: 200px;
+                font-size: 1.5rem;
+            }
+            footer table .content {
+                width: 380px;
+            }
+            footer table .empty {
+                width: 30px;
+            }
+            footer table .line {
+                width: 1px;
+                background-color: white;
+            }
+        </style>
+        {% block css %}
+        {% endblock %}
+
+        {% if error %}
+        <script>
+            alert("{{ error }}");
+        </script>
+        {% endif %}
+    </head>
+    <body>
+        <header id="top_frame" class="frame">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <a class="logo navbar-brand" href="{% url 'index' %}">Meet Wizard</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    {% if user.is_authenticated %}  <!--로그인 했을 경우만 메뉴 보여줌-->
+                    <div id="navbar" class="collapse navbar-collapse">
+                        <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+                            <li class="nav-item">
+                                <a id='nav_home' class="nav-item nav-link" href="{% url 'home' %}">HOME</a>
+                            </li>
+                            <li class="nav-item">
+                                <a id='nav_friendgroup' class="nav-item nav-link" href="{% url 'friendgroup' %}">FRIEND / GROUP</a>
+                            </li>
+                            <li class="nav-item">
+                                <a id='nav_schedule' class="nav-item nav-link" href="{% url 'schedule' %}">SCHEDULE</a>
+                            </li>
+                            <li class="nav-item">
+                                <a id='nav_location' class="nav-item nav-link" href="{% url 'location' %}">LOCATION</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-item nav-link" href="{% url 'meet_step1' %}"><button id="meet_button" type="button">MEET!</button></a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </nav>
+        </header>
+
+        <!--leftType 0:왼쪽 고정창 없음, 2: 사용자 정보, 3: STEP 정보-->
+        {% if leftType != 0 %}
+        <div id="left_frame" class="frame">
+            {% if not user.is_authenticated %}  <!--비회원일 경우-->
+            <div class="profile">
+                <img src="{% static 'images/user.png' %}"/>
+                <span class="welcome">&nbsp;&nbsp;로그인하세요.</span>
+                <span class="align_right">
+                    <a id="login" href="{% url 'login' %}">
+                        <img class="icon" src="{% static 'images/login.png' %}"/> 
+                        <span id="login">로그인</span>
+                    </a>
+                    <a id="signup" href="{% url 'signup' %}">
+                        <img class="icon" src="{% static 'images/signup_icon.png' %}"/>
+                        <span id="signup">회원가입</span>
+                    </a>
+                </span>
+            </div>
+
+            <div class="location">  <!--비회원 location 정보-->
+                <img class="icon" src="{% static 'images/location_icon.png' %}"/>
+                <span class="location_text">로그인 후, 이용 가능합니다.</span><br>
+                <div class="hr"></div>
+            </div>
+
+            <div class="nonmember schedule">
+                <div class="disabled"></div>
+                <div class="notice">로그인 후, 이용 가능합니다.</div>
+                <img class="icon" src="{% static 'images/schedule_icon.png' %}"/> <br>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="time"></th>
+                            <th class="day">월</th>
+                            <th class="day">화</th>
+                            <th class="day">수</th>
+                            <th class="day">목</th>
+                            <th class="day">금</th>
+                            <th class="day">토</th>
+                            <th class="day">일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="time" id="0900" rowspan="2">9</th>
+                            <td id="u_MON0900"></td>
+                            <td id="u_TUE0900"></td>
+                            <td id="u_WED0900"></td>
+                            <td id="u_THU0900"></td>
+                            <td id="u_FRI0900"></td>
+                            <td id="u_SAT0900"></td>
+                            <td id="u_SUN0900"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON0930"></td>
+                            <td id="u_TUE0930"></td>
+                            <td id="u_WED0930"></td>
+                            <td id="u_THU0930"></td>
+                            <td id="u_FRI0930"></td>
+                            <td id="u_SAT0930"></td>
+                            <td id="u_SUN0930"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1000" rowspan="2">10</th>
+                            <td id="u_MON1000"></td>
+                            <td id="u_TUE1000"></td>
+                            <td id="u_WED1000"></td>
+                            <td id="u_THU1000"></td>
+                            <td id="u_FRI1000"></td>
+                            <td id="u_SAT1000"></td>
+                            <td id="u_SUN1000"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1030"></td>
+                            <td id="u_TUE1030"></td>
+                            <td id="u_WED1030"></td>
+                            <td id="u_THU1030"></td>
+                            <td id="u_FRI1030"></td>
+                            <td id="u_SAT1030"></td>
+                            <td id="u_SUN1030"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1100" rowspan="2">11</th>
+                            <td id="u_MON1100"></td>
+                            <td id="u_TUE1100"></td>
+                            <td id="u_WED1100"></td>
+                            <td id="u_THU1100"></td>
+                            <td id="u_FRI1100"></td>
+                            <td id="u_SAT1100"></td>
+                            <td id="u_SUN1100"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1130"></td>
+                            <td id="u_TUE1130"></td>
+                            <td id="u_WED1130"></td>
+                            <td id="u_THU1130"></td>
+                            <td id="u_FRI1130"></td>
+                            <td id="u_SAT1130"></td>
+                            <td id="u_SUN1130"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1200" rowspan="2">12</th>
+                            <td id="u_MON1200"></td>
+                            <td id="u_TUE1200"></td>
+                            <td id="u_WED1200"></td>
+                            <td id="u_THU1200"></td>
+                            <td id="u_FRI1200"></td>
+                            <td id="u_SAT1200"></td>
+                            <td id="u_SUN1200"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1230"></td>
+                            <td id="u_TUE1230"></td>
+                            <td id="u_WED1230"></td>
+                            <td id="u_THU1230"></td>
+                            <td id="u_FRI1230"></td>
+                            <td id="u_SAT1230"></td>
+                            <td id="u_SUN1230"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1300" rowspan="2">13</th>
+                            <td id="u_MON1300"></td>
+                            <td id="u_TUE1300"></td>
+                            <td id="u_WED1300"></td>
+                            <td id="u_THU1300"></td>
+                            <td id="u_FRI1300"></td>
+                            <td id="u_SAT1300"></td>
+                            <td id="u_SUN1300"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1330"></td>
+                            <td id="u_TUE1330"></td>
+                            <td id="u_WED1330"></td>
+                            <td id="u_THU1330"></td>
+                            <td id="u_FRI1330"></td>
+                            <td id="u_SAT1330"></td>
+                            <td id="u_SUN1330"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1400" rowspan="2">14</th>
+                            <td id="u_MON1400"></td>
+                            <td id="u_TUE1400"></td>
+                            <td id="u_WED1400"></td>
+                            <td id="u_THU1400"></td>
+                            <td id="u_FRI1400"></td>
+                            <td id="u_SAT1400"></td>
+                            <td id="u_SUN1400"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1430"></td>
+                            <td id="u_TUE1430"></td>
+                            <td id="u_WED1430"></td>
+                            <td id="u_THU1430"></td>
+                            <td id="u_FRI1430"></td>
+                            <td id="u_SAT1430"></td>
+                            <td id="u_SUN1430"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1500" rowspan="2">15</th>
+                            <td id="u_MON1500"></td>
+                            <td id="u_TUE1500"></td>
+                            <td id="u_WED1500"></td>
+                            <td id="u_THU1500"></td>
+                            <td id="u_FRI1500"></td>
+                            <td id="u_SAT1500"></td>
+                            <td id="u_SUN1500"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1530"></td>
+                            <td id="u_TUE1530"></td>
+                            <td id="u_WED1530"></td>
+                            <td id="u_THU1530"></td>
+                            <td id="u_FRI1530"></td>
+                            <td id="u_SAT1530"></td>
+                            <td id="u_SUN1530"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1600" rowspan="2">16</th>
+                            <td id="u_MON1600"></td>
+                            <td id="u_TUE1600"></td>
+                            <td id="u_WED1600"></td>
+                            <td id="u_THU1600"></td>
+                            <td id="u_FRI1600"></td>
+                            <td id="u_SAT1600"></td>
+                            <td id="u_SUN1600"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1630"></td>
+                            <td id="u_TUE1630"></td>
+                            <td id="u_WED1630"></td>
+                            <td id="u_THU1630"></td>
+                            <td id="u_FRI1630"></td>
+                            <td id="u_SAT1630"></td>
+                            <td id="u_SUN1630"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1700" rowspan="2">17</th>
+                            <td id="u_MON1700"></td>
+                            <td id="u_TUE1700"></td>
+                            <td id="u_WED1700"></td>
+                            <td id="u_THU1700"></td>
+                            <td id="u_FRI1700"></td>
+                            <td id="u_SAT1700"></td>
+                            <td id="u_SUN1700"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1730"></td>
+                            <td id="u_TUE1730"></td>
+                            <td id="u_WED1730"></td>
+                            <td id="u_THU1730"></td>
+                            <td id="u_FRI1730"></td>
+                            <td id="u_SAT1730"></td>
+                            <td id="u_SUN1730"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1800" rowspan="2">18</th>
+                            <td id="u_MON1800"></td>
+                            <td id="u_TUE1800"></td>
+                            <td id="u_WED1800"></td>
+                            <td id="u_THU1800"></td>
+                            <td id="u_FRI1800"></td>
+                            <td id="u_SAT1800"></td>
+                            <td id="u_SUN1800"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1830"></td>
+                            <td id="u_TUE1830"></td>
+                            <td id="u_WED1830"></td>
+                            <td id="u_THU1830"></td>
+                            <td id="u_FRI1830"></td>
+                            <td id="u_SAT1830"></td>
+                            <td id="u_SUN1830"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="1900" rowspan="2">19</th>
+                            <td id="u_MON1900"></td>
+                            <td id="u_TUE1900"></td>
+                            <td id="u_WED1900"></td>
+                            <td id="u_THU1900"></td>
+                            <td id="u_FRI1900"></td>
+                            <td id="u_SAT1900"></td>
+                            <td id="u_SUN1900"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON1930"></td>
+                            <td id="u_TUE1930"></td>
+                            <td id="u_WED1930"></td>
+                            <td id="u_THU1930"></td>
+                            <td id="u_FRI1930"></td>
+                            <td id="u_SAT1930"></td>
+                            <td id="u_SUN1930"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="2000" rowspan="2">20</th>
+                            <td id="u_MON2000"></td>
+                            <td id="u_TUE2000"></td>
+                            <td id="u_WED2000"></td>
+                            <td id="u_THU2000"></td>
+                            <td id="u_FRI2000"></td>
+                            <td id="u_SAT2000"></td>
+                            <td id="u_SUN2000"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON2030"></td>
+                            <td id="u_TUE2030"></td>
+                            <td id="u_WED2030"></td>
+                            <td id="u_THU2030"></td>
+                            <td id="u_FRI2030"></td>
+                            <td id="u_SAT2030"></td>
+                            <td id="u_SUN2030"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="2100" rowspan="2">21</th>
+                            <td id="u_MON2100"></td>
+                            <td id="u_TUE2100"></td>
+                            <td id="u_WED2100"></td>
+                            <td id="u_THU2100"></td>
+                            <td id="u_FRI2100"></td>
+                            <td id="u_SAT2100"></td>
+                            <td id="u_SUN2100"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON2130"></td>
+                            <td id="u_TUE2130"></td>
+                            <td id="u_WED2130"></td>
+                            <td id="u_THU2130"></td>
+                            <td id="u_FRI2130"></td>
+                            <td id="u_SAT2130"></td>
+                            <td id="u_SUN2130"></td>
+                        </tr>
+                        <tr>
+                            <th class="time" id="2000" rowspan="2">22</th>
+                            <td id="u_MON2200"></td>
+                            <td id="u_TUE2200"></td>
+                            <td id="u_WED2200"></td>
+                            <td id="u_THU2200"></td>
+                            <td id="u_FRI2200"></td>
+                            <td id="u_SAT2200"></td>
+                            <td id="u_SUN2200"></td>
+                        </tr>
+                        <tr>
+                            <td id="u_MON2230"></td>
+                            <td id="u_TUE2230"></td>
+                            <td id="u_WED2230"></td>
+                            <td id="u_THU2230"></td>
+                            <td id="u_FRI2230"></td>
+                            <td id="u_SAT2230"></td>
+                            <td id="u_SUN2230"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% else %}  <!--로그인 했을 경우-->
+            <div class="profile">
+                {% if user.image %}  
+                <img class="profile_img" src="{{ user.image.url }}"/>
+                {% else %}
+                <img class="profile_img default" src="{% static 'images/user.png' %}"/>
+                {% endif %}
+                <span class="welcome">{{ user.username }}</span>
+                <span class="align_right icons">
+                    <a class="logout" href="javascript:{document.getElementById('logout').submit()}">
+                        <img class="icon" src="{% static 'images/logout.png' %}"/>
+                        <span id="logout2">로그아웃</span>
+                    </a>
+                    <form id="logout" method="POST" action="{% url 'logout' %}" style="display:none;">
+                        
+                        {% csrf_token %} <input type="hidden"/>
+                    </form>
+                    <a href="{% url 'setting' %}">
+                        <img class="icon" src="{% static 'images/setting.png' %}"/>
+                        <span id="setting">설정</span>
+                    </a>
+                </span>
+            </div>
+                {% if leftType == 2 %}  <!--사용자 정보 보여주기-->
+                <div class="location">
+                    <img class="icon" src="{% static 'images/location_icon.png' %}"/>
+                    {% if location %}
+                    <span class="location_text">{{ location.address }}</span><br>
+                    {% else %}
+                    <span class="location_text">아직 설정한 위치가 없습니다.</span><br>
+                    {% endif %}
+                    <div class="hr"></div>
+                </div>
+
+                <div class="schedule">
+                    <img class="icon" src="{% static 'images/schedule_icon.png' %}"/> <br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="time"></th>
+                                <th class="day">월</th>
+                                <th class="day">화</th>
+                                <th class="day">수</th>
+                                <th class="day">목</th>
+                                <th class="day">금</th>
+                                <th class="day">토</th>
+                                <th class="day">일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="time" id="0900" rowspan="2">9</th>
+                                <td id="u_MON0900"></td>
+                                <td id="u_TUE0900"></td>
+                                <td id="u_WED0900"></td>
+                                <td id="u_THU0900"></td>
+                                <td id="u_FRI0900"></td>
+                                <td id="u_SAT0900"></td>
+                                <td id="u_SUN0900"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON0930"></td>
+                                <td id="u_TUE0930"></td>
+                                <td id="u_WED0930"></td>
+                                <td id="u_THU0930"></td>
+                                <td id="u_FRI0930"></td>
+                                <td id="u_SAT0930"></td>
+                                <td id="u_SUN0930"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1000" rowspan="2">10</th>
+                                <td id="u_MON1000"></td>
+                                <td id="u_TUE1000"></td>
+                                <td id="u_WED1000"></td>
+                                <td id="u_THU1000"></td>
+                                <td id="u_FRI1000"></td>
+                                <td id="u_SAT1000"></td>
+                                <td id="u_SUN1000"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1030"></td>
+                                <td id="u_TUE1030"></td>
+                                <td id="u_WED1030"></td>
+                                <td id="u_THU1030"></td>
+                                <td id="u_FRI1030"></td>
+                                <td id="u_SAT1030"></td>
+                                <td id="u_SUN1030"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1100" rowspan="2">11</th>
+                                <td id="u_MON1100"></td>
+                                <td id="u_TUE1100"></td>
+                                <td id="u_WED1100"></td>
+                                <td id="u_THU1100"></td>
+                                <td id="u_FRI1100"></td>
+                                <td id="u_SAT1100"></td>
+                                <td id="u_SUN1100"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1130"></td>
+                                <td id="u_TUE1130"></td>
+                                <td id="u_WED1130"></td>
+                                <td id="u_THU1130"></td>
+                                <td id="u_FRI1130"></td>
+                                <td id="u_SAT1130"></td>
+                                <td id="u_SUN1130"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1200" rowspan="2">12</th>
+                                <td id="u_MON1200"></td>
+                                <td id="u_TUE1200"></td>
+                                <td id="u_WED1200"></td>
+                                <td id="u_THU1200"></td>
+                                <td id="u_FRI1200"></td>
+                                <td id="u_SAT1200"></td>
+                                <td id="u_SUN1200"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1230"></td>
+                                <td id="u_TUE1230"></td>
+                                <td id="u_WED1230"></td>
+                                <td id="u_THU1230"></td>
+                                <td id="u_FRI1230"></td>
+                                <td id="u_SAT1230"></td>
+                                <td id="u_SUN1230"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1300" rowspan="2">1</th>
+                                <td id="u_MON1300"></td>
+                                <td id="u_TUE1300"></td>
+                                <td id="u_WED1300"></td>
+                                <td id="u_THU1300"></td>
+                                <td id="u_FRI1300"></td>
+                                <td id="u_SAT1300"></td>
+                                <td id="u_SUN1300"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1330"></td>
+                                <td id="u_TUE1330"></td>
+                                <td id="u_WED1330"></td>
+                                <td id="u_THU1330"></td>
+                                <td id="u_FRI1330"></td>
+                                <td id="u_SAT1330"></td>
+                                <td id="u_SUN1330"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1400" rowspan="2">2</th>
+                                <td id="u_MON1400"></td>
+                                <td id="u_TUE1400"></td>
+                                <td id="u_WED1400"></td>
+                                <td id="u_THU1400"></td>
+                                <td id="u_FRI1400"></td>
+                                <td id="u_SAT1400"></td>
+                                <td id="u_SUN1400"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1430"></td>
+                                <td id="u_TUE1430"></td>
+                                <td id="u_WED1430"></td>
+                                <td id="u_THU1430"></td>
+                                <td id="u_FRI1430"></td>
+                                <td id="u_SAT1430"></td>
+                                <td id="u_SUN1430"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1500" rowspan="2">3</th>
+                                <td id="u_MON1500"></td>
+                                <td id="u_TUE1500"></td>
+                                <td id="u_WED1500"></td>
+                                <td id="u_THU1500"></td>
+                                <td id="u_FRI1500"></td>
+                                <td id="u_SAT1500"></td>
+                                <td id="u_SUN1500"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1530"></td>
+                                <td id="u_TUE1530"></td>
+                                <td id="u_WED1530"></td>
+                                <td id="u_THU1530"></td>
+                                <td id="u_FRI1530"></td>
+                                <td id="u_SAT1530"></td>
+                                <td id="u_SUN1530"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1600" rowspan="2">4</th>
+                                <td id="u_MON1600"></td>
+                                <td id="u_TUE1600"></td>
+                                <td id="u_WED1600"></td>
+                                <td id="u_THU1600"></td>
+                                <td id="u_FRI1600"></td>
+                                <td id="u_SAT1600"></td>
+                                <td id="u_SUN1600"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1630"></td>
+                                <td id="u_TUE1630"></td>
+                                <td id="u_WED1630"></td>
+                                <td id="u_THU1630"></td>
+                                <td id="u_FRI1630"></td>
+                                <td id="u_SAT1630"></td>
+                                <td id="u_SUN1630"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1700" rowspan="2">5</th>
+                                <td id="u_MON1700"></td>
+                                <td id="u_TUE1700"></td>
+                                <td id="u_WED1700"></td>
+                                <td id="u_THU1700"></td>
+                                <td id="u_FRI1700"></td>
+                                <td id="u_SAT1700"></td>
+                                <td id="u_SUN1700"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1730"></td>
+                                <td id="u_TUE1730"></td>
+                                <td id="u_WED1730"></td>
+                                <td id="u_THU1730"></td>
+                                <td id="u_FRI1730"></td>
+                                <td id="u_SAT1730"></td>
+                                <td id="u_SUN1730"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1800" rowspan="2">6</th>
+                                <td id="u_MON1800"></td>
+                                <td id="u_TUE1800"></td>
+                                <td id="u_WED1800"></td>
+                                <td id="u_THU1800"></td>
+                                <td id="u_FRI1800"></td>
+                                <td id="u_SAT1800"></td>
+                                <td id="u_SUN1800"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1830"></td>
+                                <td id="u_TUE1830"></td>
+                                <td id="u_WED1830"></td>
+                                <td id="u_THU1830"></td>
+                                <td id="u_FRI1830"></td>
+                                <td id="u_SAT1830"></td>
+                                <td id="u_SUN1830"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="1900" rowspan="2">7</th>
+                                <td id="u_MON1900"></td>
+                                <td id="u_TUE1900"></td>
+                                <td id="u_WED1900"></td>
+                                <td id="u_THU1900"></td>
+                                <td id="u_FRI1900"></td>
+                                <td id="u_SAT1900"></td>
+                                <td id="u_SUN1900"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON1930"></td>
+                                <td id="u_TUE1930"></td>
+                                <td id="u_WED1930"></td>
+                                <td id="u_THU1930"></td>
+                                <td id="u_FRI1930"></td>
+                                <td id="u_SAT1930"></td>
+                                <td id="u_SUN1930"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="2000" rowspan="2">8</th>
+                                <td id="u_MON2000"></td>
+                                <td id="u_TUE2000"></td>
+                                <td id="u_WED2000"></td>
+                                <td id="u_THU2000"></td>
+                                <td id="u_FRI2000"></td>
+                                <td id="u_SAT2000"></td>
+                                <td id="u_SUN2000"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON2030"></td>
+                                <td id="u_TUE2030"></td>
+                                <td id="u_WED2030"></td>
+                                <td id="u_THU2030"></td>
+                                <td id="u_FRI2030"></td>
+                                <td id="u_SAT2030"></td>
+                                <td id="u_SUN2030"></td>
+                            </tr>
+                            <tr>
+                                <th class="time" id="2100" rowspan="2">9</th>
+                                <td id="u_MON2100"></td>
+                                <td id="u_TUE2100"></td>
+                                <td id="u_WED2100"></td>
+                                <td id="u_THU2100"></td>
+                                <td id="u_FRI2100"></td>
+                                <td id="u_SAT2100"></td>
+                                <td id="u_SUN2100"></td>
+                            </tr>
+                            <tr>
+                                <td id="u_MON2130"></td>
+                                <td id="u_TUE2130"></td>
+                                <td id="u_WED2130"></td>
+                                <td id="u_THU2130"></td>
+                                <td id="u_FRI2130"></td>
+                                <td id="u_SAT2130"></td>
+                                <td id="u_SUN2130"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif leftType == 3 %}    <!--STEP 정보 보여주기-->
+                <div id="step1" class="step">
+                    <p class="step_title">STEP 1. 그룹 선택</p> <!--p_id step_title 겹치면 안되니 class로-->
+                    <p class="step_description">약속 지점 탐색 결과를 보고 싶은 그룹을 선택해주세요.</p>
+                </div>
+                <div id="step2" class="step">
+                    <p class="step_title">STEP 2. 나의 시간표,<br>출발위치 확인</p>
+                    <p class="step_description">내가 설정한 시간표, 출발위치를 확인하고, 수정하세요.</p>
+                </div>
+                <div id="step3" class="step">
+                    <p class=step_title>STEP 3. 그룹 시간표,<br>출발위치 확인</p>
+                    <p class="step_description">그룹 전체에서 설정된 시간표, 출발위치를 확인하세요.
+                </div>
+                <div id="step4" class="step">
+                    <p class=step_title>STEP 4. <br> 약속 시간 및 장소 탐색 결과 </p>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% block main-content %}
+        {% endblock %}
+
+        <footer>
+            <table>
+                <tr>
+                    <td class="logo" rowspan="4">Meet Wizard</td>
+                    <td class="empty" rowspan="4"></td>
+                    <td class="line" rowspan="4"></td>
+                    <td class="empty" rowspan="4"></td>
+                    <td class="content">이용약관 | 위치기반서비스이용약관 | 개인정보처리방침</td>
+                </tr>
+                <tr>
+                    <td class="content">대표자명: Manna|주소:서울시 용산구 청파로 47길 100 숙명여자대학교</td>
+                </tr>
+                <tr>
+                    <td class="content">문의전화: 02-000-0000 | 문의메일:manna@likelion.org</td>
+                </tr>
+                <tr>
+                    <td class="content">Copyright 2021.Meet Wizard Corp.All rights reserved.</td>
+                </tr>
+            </table>
+        </footer>
+
+    </body>
+    {% block js %}
+    {% endblock %}
+    <script type="text/javascript">
+        function show_schedule() {  //사용자 스케줄 나타내기
+            {% for schedule in schedules %}    
+            if ("{{ schedule.value }}" == "1") {    //약속 선호 유형이면 "O" 클래스에 추가
+                document.getElementById("u_" + "{{ schedule.day }}" + "{{ schedule.time }}").classList.add('O');
+            }
+            else if ("{{ schedule.value }}" == "-1") {  //약속 불가 유형이면 "X" 클래스에 추가
+                document.getElementById("u_" + "{{ schedule.day }}" + "{{ schedule.time }}").classList.add('X');
+            }
+            {% endfor %}
+        }
+
+        show_schedule();    //사용자 스케줄 나타내기
+    </script>
+</html>

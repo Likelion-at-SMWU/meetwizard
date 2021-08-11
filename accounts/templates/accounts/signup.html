@@ -1,0 +1,132 @@
+{% extends 'base.html' %} 
+
+{% block css %}
+<style type="text/css">
+    * {
+        box-sizing: border-box;
+    }
+
+    .title {
+        text-align: center;
+        margin-top: 50px;
+        font-family: 'Cafe24Ssurround', normal;
+        font-size: 28px;
+    }
+
+    div.signup-form {
+        display: inline-block;
+        text-align: center;
+        width: 580px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: 20%;
+        padding: 40px 20px;
+        background-color: #F4F6F7;
+        border-radius: 30px;
+    }
+    /*label[for="id_image"] {
+        line-height: 30px;
+        height: 30px;
+    }*/
+    div#image_container {
+        width: 60px;
+        height: 60px;
+        background-color: rgb(255, 255, 255);
+        border: 1px solid rgb(54, 50, 59);
+        border-radius: 70px;
+        overflow: hidden;
+    }
+    div#image_container img {
+        width: 100%;
+        height: 100%;
+        
+        object-fit: cover;
+    }
+    /*#id_image {
+        margin-top: 10px;
+    }*/
+    div.table {
+        display: inline-block;
+    }
+
+    table th {
+        text-align: left;
+        margin-right: 50px;
+    }
+    table input {
+        margin-bottom: 10px;
+    }
+    div#submit {
+        text-align: center;
+    }
+    input#submit {
+        padding: 6px 12px;
+        font-size: 18px;
+        background: #dfe0e0;
+        color: rgb(0, 0, 0);
+        border: 0px;
+        border-radius: 7px;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+{% if error %}
+{{ error }}
+<br>
+<br>
+{% endif %}
+
+{% block main-content %}
+<main>
+<div class="title">
+    <span>회원가입</span>
+</div>
+
+<div>
+    <form method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="signup-form">
+            <table>
+                {{ form.as_table }}<br>
+            </table>
+        </div>
+        <br>
+        <div id="submit">
+            <input type="submit" id="submit" value="가입">
+        </div>  
+    </form>
+</div>
+</main>
+{% endblock %}
+
+{% block js %} 
+<script type="text/javascript">
+    // 이 함수는 이미지 미리보기를 제공하지만 왼쪽 고정창에 이미지 업로드가 되지 않는 오류가 발생
+    // 따라서 accounts.models 에서 image의 attrs에서 제거했음..
+    function setThumbnail(event) { 
+        var reader = new FileReader();
+
+        reader.onload = function(event) {
+            //영역 만들기
+            if (! document.querySelector("div#image_container")) {
+                var dom = document.getElementById("id_image");
+                dom.parentNode.innerHTML += "<div id='image_container'></div><br>";
+            }
+
+            document.querySelector("div#image_container").innerHTML = "";   //image_container 초기화
+
+            //해당 영역에 이미지 보여주기
+            var img = document.createElement("img");
+            img.setAttribute("src", event.target.result);
+            document.querySelector("div#image_container").appendChild(img);
+        };
+
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}
+
+{% endblock %}

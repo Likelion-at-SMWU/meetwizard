@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+
+    /* header */
+    #header {
+        margin-bottom:30px;
+    }
+
+    #location_body {
+        margin-left: 30px;
+        margin-bottom: 20px;
+    }
+    button[name="save"] {
+        margin-left: 20px;
+    }
+    input[name="address"] {
+        width: 80%;
+        float: left;
+        border: none;
+        border-bottom: 1px solid;
+    }
+    input[name="address"]:focus {
+        outline: none;
+    }
+    #map {
+        width: 90%;
+        height: 70%;
+        float:left;
+        margin-top: 15px;
+    }
+    #map_control {
+        z-index: 9999;
+        position: absolute;
+        left: 390px;
+        top: 260px;
+    }
+    #map_control input[name="location_keyword"] {
+        width: 300px;
+        border-radius: 10px;
+        background-color: #FCFCFB;
+        box-shadow: 3px 3px 6px rgb(0 0 0 / 16%);
+        border: none;
+        padding: 7 15 7 15;
+        font-size: 13px;
+    }
+    #map_control #search_btn{
+        position: absolute;
+        top: 6;
+        right: 9;
+        width: 20px;
+    }
+    #current_gps_btn {
+        width: 70px;
+        background-color: #FCFCFB;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.161);
+        border-radius: 10px;
+        margin-top: 5px;
+        padding: 10;
+        border: none;
+        cursor: pointer;
+        font-size: 10px;
+        text-align: center;
+        font-weight: bold;
+    }
+    #current_gps_btn img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5px;
+        width: 16px;
+        height: 16px;
+    }
+
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <div id="header">
+        <img class="icon" src="{% static 'images/map_icon.png' %}"/>
+        <span>출발 위치 설정</span>
+    </div>
+    <div id="location_body">
+        <form id="form_location" method="POST" action="{% url 'saveLocation' %}">
+            {% csrf_token %}
+            <div>
+                {% if location.address %}
+                <input id="address" name="address" type="text" value="{{ location.address }}" readonly="True">
+                {% else %}
+                <input id="address" name="address" type="text" value="입력된 값이 없습니다. 위치를 검색해주세요!" readonly="True">
+                {% endif %}
+                <input id="latitude" name="latitude" type="text" value="" style="display: none;">
+                <input id="longitude" name="longitude" type="text" value="" style="display: none;">
+            </div>
+        </form>
+        <button name="save" onclick="location_save();">저장</button>
+
+        <div id="map_control">
+            <div id="location_search_btn">
+                <input id="location_keyword" name="location_keyword" type="text" placeholder="위치를 검색해주세요" onKeypress="javascript:if(event.keyCode==13) {getPostcode();}"/>
+                <img id="search_btn" src="{% static 'images/search.png' %}" onclick="getPostcode();"/>
+            </div>
+            <div id="current_gps_btn" onclick="loadCoords();">
+                <img src="{% static 'images/current_gps_icon.png'%}"/>
+                <span>나의 위치</span>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=83649d17ed6ffdbebc59d18cca995938&libraries=services"></script>
+<script>
+    //KAKAO API를 통해 지도 불러오기
+    var container = document.getElementById('map');
+
+    if( "{{location.address}}") {
+        var options = {
+            center: new kakao.maps.LatLng("{{ location.latitude }}", "{{ location.longitude }}"),  //중심점 - 데이터베이스에 있는 값
+            level: 3,    //줌 레벨
+        };
+    }
+    else {
+        var options = {
+            center: new kakao.maps.LatLng("37.566439750970886", "126.97800947070422"),  //중심점 - 서울시청
+            level: 3,    //줌 레벨
+        };
+    }
+
+	var map = new kakao.maps.Map(container, options);
+
+    // 지도에 확대 축소 컨트롤을 생성한다
+	var zoomControl = new kakao.maps.ZoomControl();
+
+    // 지도의 우측에 확대 축소 컨트롤을 추가한다
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+    //model에 저장된 사용자의 위치를 마커로 표시
+    if( "{{location.address}}") {
+        marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng("{{ location.latitude }}", "{{ location.longitude }}"),
+            image: new kakao.maps.MarkerImage("{% static 'images/marker_icon.png' %}", new kakao.maps.Size(31, 35), new kakao.maps.Point(13, 34)),
+        });
+        marker.setMap(map);
+    }
+    else {
+        marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng("37.566439750970886", "126.97800947070422"),
+            image: new kakao.maps.MarkerImage("{% static 'images/marker_icon.png' %}", new kakao.maps.Size(31, 35), new kakao.maps.Point(13, 34)),
+        });
+        marker.setMap(map);
+    }
+
+    //지도 클릭 이벤트
+    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+        var geocoder = new kakao.maps.services.Geocoder();  //주소-좌표 변환 객체 생성
+        geocoder.coord2Address(mouseEvent.latLng.getLng(), mouseEvent.latLng.getLat(), function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var detailAddr = !!result[0].road_address ? result[0].road_address.address_name : '';   //도로명 주소
+                if (detailAddr == '') detailAddr += result[0].address.address_name; //도로명 주소가 없다면 지번 주소를 가져옴
+
+                document.getElementById("address").value = detailAddr; //form에 주소 저장
+                setFormLatLng(mouseEvent.latLng.getLat(), mouseEvent.latLng.getLng());  //form에 위도경도 저장
+                marker.setPosition(mouseEvent.latLng);    //마커를 클릭한 위치에 표시
+            }   
+        });
+    });
+
+    //지도의 중심점을 변경하는 함수
+    function changePoint(lat, long) {
+        map.setCenter(new kakao.maps.LatLng(lat, long));
+        map.setLevel(3);
+    }
+
+    //마커의 위치를 변경하는 함수
+    function changeMarker(lat, long) {
+        marker.setPosition(new kakao.maps.LatLng(lat, long));
+    }
+
+    //좌표-주소 변환하고 form에 주소를 저장하는 함수
+    function getAddress(lat, long) {
+        var geocoder = new kakao.maps.services.Geocoder();  //주소-좌표 변환 객체 생성
+        geocoder.coord2Address(long, lat, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var detailAddr = !!result[0].road_address ? result[0].road_address.address_name : '';   //도로명 주소
+                if (detailAddr == '') detailAddr += result[0].address.address_name; //도로명 주소가 없다면 지번 주소를 가져옴
+
+                document.getElementById("address").value = detailAddr; //form에 주소 저장
+            }
+        })
+    }
+
+    function getGeofromAddress(address) {
+        var geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                changePoint(result[0].y, result[0].x);  //지도의 중심 옮기기
+                changeMarker(result[0].y, result[0].x); //마커 옮기기
+                setFormLatLng(result[0].y, result[0].x);//form에 저장
+            }
+        });
+    }
+
+    //form의 latitude와 longitude에 값을 저장하는 함수
+    function setFormLatLng(lat, long) {
+        document.getElementById("latitude").value = lat; //form에 latitude 저장
+        document.getElementById("longitude").value = long;//form에 longitude 저장
+    }
+</script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    function getPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById("address").value = data.address;    //form에 주소 저장
+                getGeofromAddress(data.address);    //주소를 통해 위도경도 구하기
+            }
+        }).open({
+            q: document.getElementById("location_keyword").value
+        });
+    }
+</script>
+<script type="text/javascript">
+    function loadCoords() {
+        const loadedCoords = localStorage.getItem("coords");
+        //현재 위치 값을 받아옴
+        navigator.geolocation.getCurrentPosition(handleGeoSuccess, handleGeoError);
+    }
+
+    //GPS 값을 받아오는 것에 성공했을 경우 실행되는 함수
+    function handleGeoSuccess(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const coordsObj = {
+            latitude,
+            longitude
+        };
+        
+        localStorage.setItem("coords", JSON.stringify(coordsObj));
+        changeMarker(latitude, longitude);  //지도에 현재 위치 마커 표시하기
+        changePoint(latitude, longitude);   //지도의 중심점을 현재 위치로 바꾸기
+        setFormLatLng(latitude, longitude);     //form에 위도경도 저장
+        getAddress(latitude, longitude);    //form에 주소 저장
+    }
+
+    function handleGeoError() {
+        console.log("Can't access geo location");
+    }
+</script>
+<script type="text/javascript">
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('nav_location').classList.add('active');
+
+    function location_save() {
+        if (document.getElementById("latitude").value == "") {
+            alert("출발 위치가 설정되지 않았습니다.");
+        }
+        else {
+            document.getElementById('form_location').submit();
+        }
+    }
+</script>
+
+{% endblock %}
+

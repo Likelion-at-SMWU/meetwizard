@@ -1,0 +1,222 @@
+<!--TODO:showall 넘기기 기능-->
+<!--TODO:STEP을 넘어갔는데 url 바뀌지 않아-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+    .star-icon {
+        width: 20px;
+        margin-left: 2.5px;
+        margin-right: 2.5px;
+    }
+    .showall {
+        color: purple;
+        text-decoration-line: none;
+    }
+
+    #title {
+        margin-top: 50px;
+    }
+
+    #step1_menu {
+        margin: 40 130 0 130
+    }
+    #form_group_search {    /* 그룹 이름 검색폼 */
+        position: relative;
+        display: inline-block;
+    }
+    #form_group_search img {
+        position: absolute;
+        top: 4px;
+        left: 5px;
+        width: 20px;
+    }
+    #form_group_search input[name="group_name"] {
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 2 10 2 30;
+        font-size: 0.9rem;
+    }
+    #selected_group_name {
+        padding-right: 10;
+        font-size: 0.9rem;
+    }
+    #next_button {  /* STEP2로 이동하기 위한 버튼 */
+        display: inline-block;
+        border: 0;
+        border-radius: 5px;
+        outline: 0;
+        background-color: #8E44AD;
+        text-decoration:none; 
+        color: #ffffff;
+        font-size: 0.9rem;
+        padding: 5px;
+        width: 60px;
+    }
+    #data-container {
+        width: 80%;
+        min-width: 900px;
+        margin: 10 auto 20;
+    }
+    #data-container .col {
+        border: solid 1px #707070;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20 30;
+        height: 170px;
+        text-align: center;
+        cursor: pointer;
+    }
+    #data-container figure {
+        display: inline-block;
+        font-size: 0.75rem;
+        width: 80px;
+    }
+    #data-container .jbBox {    /* 사용자가 해당 그룹을 선택했을 때 */
+        border: outset 3px #8E44AD;
+    }
+    #data-container .title {
+        text-align: justify;
+        font-weight: bold;
+    }
+    #data-container .member_profile {
+        margin: auto;
+        width: 60px;
+    }
+    #data-container .more {
+        font-size: 10pt;
+        text-decoration: underline;
+        text-align: right;
+        margin-top: -3px;
+    }
+</style>
+{% endblock %}
+
+{% block main-content %}
+<main>
+    <div id="title">
+        <img class="star-icon" src="{% static 'images/star.png' %}">
+        <span>탐색 결과 찾기 - STEP 1</span><br><br>
+    </div>
+
+    <div id="step1_menu">
+        <form id="form_group_search" method="GET">
+            {% csrf_token %}
+            <img class="group_search_btn" src="{% static 'images/search_thin_icon.png' %}" onclick="document.getElementById('form_group_search').submit();"/>
+            <input id="group_name" name="group_name" type="text" placeholder="그룹 이름 검색" value="{{ search_name }}" onKeypress="javascript:if(event.keyCode==13) {document.getElementById('form_group_search').submit();}"/>
+        </form>
+
+        <form id="form_select_group" method="POST" style="display: none;" action="{% url 'saveGroupGid' %}">
+            {% csrf_token %}
+            <input id="selected_gid" name="selected_gid" value=""/>
+        </form>
+
+        <div class="float-right">
+            <span id="selected_group_name">현재 선택된 그룹이 없습니다.</span>
+            <button id="next_button" onclick="go_step2();">&nbsp;Next></button>
+        </div>
+    </div>
+
+    <div id="data-container">
+        {% regroup groups_members by group as group_list %}
+        {% for group in group_list %}
+        {% if forloop.counter|divisibleby:2 == 0 %} <!--2개씩 row로 묶기 위해-->
+        <div class='row'>
+        {% endif %}
+            <div id="group{{ group.grouper.gid }}" class="col">
+                <p class="title">{{ group.grouper.name }}</p>
+                {% for member in group.list %}
+                {% if forloop.counter <= 4 %}
+                <figure title="아이디: {{ member.member.username }}&#10;이름: {{ member.member.name }}&#10;TEL) {{ member.member.tel }}">
+                    <!--img id: gid + "member" + uid-->
+                    {% if member.member.image %}
+                    <img id="{{ group.grouper.gid }}member{{ member.member.uid }}" class="member_profile" src="{{ member.member.image.url }}">
+                    {% else %}
+                    <img id="{{ group.grouper.gid }}member{{ member.member.uid }}" class="member_profile" src="{% static 'images/user2_icon.png' %}">
+                    {% endif %}
+                    <figcaption>{{ member.member.username }}</figcaption>
+                </figure>
+                
+                {% elif forloop.counter == 5 %}
+                <br>
+                <div class="more">
+                    <a class ="showall" href="{% url 'meet_showall' group.grouper.gid %}">...외 {{ group.list|length|add:"-4" }}명&nbsp;({{group.list|length}}명 전체보기)</a>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        {% if forloop.counter|divisibleby:2 == 1 %}
+        </div>
+        {% endif %}
+        {% if forloop.last and forloop.counter|divisibleby:2 == 0 %}    <!--크기를 맞추기 위해 group이 홀수개라면 공간을 만듦-->
+        <div class="col" style="visibility: hidden;"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    {% if not groups %}
+        alert("현재 생성된 그룹이 없으므로 FRIEND/GROUP 페이지로 이동합니다.\n서비스 이용을 위해 그룹을 생성해주세요😊")
+        window.location.href = "{% url 'friendgroup' %}";
+    {% endif %}
+    //해당 메뉴항목이 선택됐음을 나타냄
+    document.getElementById('step1').classList.add('active');
+
+    function go_step2() {   //step2로 가기 위해 유효성 검사
+        //그룹이 선택됐는지 체크
+        var selected_group = document.getElementsByClassName("jbBox");
+        if (selected_group.length == 1) {   //그룹이 선택됨
+            document.getElementById("form_select_group").submit();
+        }
+        else if (selected_group.length == 0){   //그룹이 선택되지 않음
+            alert("그룹이 선택되지 않았습니다.");
+        }
+        else {
+            alert("시스템 오류로 인해 새로고침 후 다시 시도해주세요.");
+        }
+
+    }
+</script>
+
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $( document ).ready( function() {
+        $( '.col' ).click( function() {
+            $( '.col' ).removeClass('jbBox');   //모든 그룹의 jbBox 클래스 없애기
+
+            var id = $(this).attr('id');    //선택한 그룹의 div 아이디
+            $( '#' + id ).toggleClass('jbBox'); //jbBox 클래스 추가
+
+            var gid = id.substring(5,);   //gid만 추출하기
+
+            {% for group in groups %} 
+            if ("{{ group.gid }}" == gid) {
+                $( '#selected_group_name ').html("선택된 그룹: " + "{{ group.name }}") // 선택한 그룹 사용자에게 알려주기
+            }
+            {% endfor %}
+            $( '#selected_gid' ).val(gid)   //form input 바꿔주기
+        });
+    });
+
+    {% if gid %}
+        $( '.col' ).removeClass('jbBox');   //모든 그룹의 jbBox 클래스 없애기
+        $( '#group' + "{{ gid }}" ).toggleClass('jbBox'); //jbBox 클래스 추가
+
+        {% for group in groups %} 
+            if ("{{ group.gid }}" == "{{ gid }}") {
+                $( '#selected_group_name ').html("선택된 그룹: " + "{{ group.name }}") // 선택한 그룹 사용자에게 알려주기
+            }
+        {% endfor %}
+        $( '#selected_gid' ).val("{{ gid }}")   //form input 바꿔주기
+    {% endif %}
+</script>
+{% endblock %}
