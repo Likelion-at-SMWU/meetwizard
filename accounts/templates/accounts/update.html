@@ -23,12 +23,18 @@
                 font-style: normal;
     }
 
+    .profile {
+        font-family: 'HeirofLightBold';
+        font-size: 1.5rem;
+        color: rgba(142,68,173);
+    }
+
 </style>
 {% endblock %}
 
 {% block main-content %}
 <main>
-<h1>프로필 수정</h1>
+<h1 id = "profile">프로필 수정</h1>
 
 <form method="POST">
     {% csrf_token %}
