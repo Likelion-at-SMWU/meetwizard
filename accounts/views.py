@@ -87,7 +87,7 @@ def password(request):
     
     else:
         password_change_form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/password.html',{'password_change_form':password_change_form})
+        return render(request, 'accounts/password.html',{'error':'비밀번호 변경에 실패하였습니다.', 'password_change_form':password_change_form})
 
 @login_required
 def update(request):
