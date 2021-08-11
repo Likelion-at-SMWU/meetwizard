@@ -20,6 +20,11 @@ def nonmemberhome(request):
     param = {
         'leftType':1,       
     }
+    if request.method=="POST": 
+        return render(request, 'meet/nonmemberhome.html', param)
+            # #POST로 전달된 값 변수에 저장
+            # group_name = request.POST["group_name"]                 #group_name: 그룹명
+            # group_members = request.POST.getlist("group_member")    #group_members: 멤버(친구들 중 체크박스 true인 목록)
     return render(request, 'meet/nonmemberhome.html', param)
 
 

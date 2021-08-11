@@ -154,6 +154,15 @@ def ajax_find_id_view(request):
 # 비밀번호 찾기 오류나면 주석처리 해줘 -다연
 from .forms import RecoveryPwForm
 
+# 비 로그인인지 확인하는 함수
+def logout_message_required(function):
+    def wrap(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.info(request, "접속중인 사용자입니다.")
+            return redirect('/users/main/')
+        return function(request, *args, **kwargs)
+    return wrap
+
 @method_decorator(logout_message_required, name='dispatch')
 class RecoveryPwView(View):
     template_name = 'accounts/recovery_pw.html'
