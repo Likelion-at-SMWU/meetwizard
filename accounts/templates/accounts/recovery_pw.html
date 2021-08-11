@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 
 {% block css %}
+<style type="text/css">
+main {
+    margin-top: 30px;
+    margin-left: 350px;
+}
 
+input[type="text"], input[type="email"] {
+    width: 400px;
+}
+
+</style>
 {% endblock %}
 
 {% block main-content %}
@@ -9,7 +19,7 @@
 <div>
     {% csrf_token %}
     <div>
-        <label name="label_user_id" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        <label name="label_username_id" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
         {{ form.username }}
     </div>
     <div>
@@ -87,7 +97,7 @@
                     }
                     countdown("#timeset", 5, 0);
 
-                    var user = response.result
+                    var username = response.result
 
                     $(document).ready(function () {
                         $('#id_auth_confirm').click(function () {

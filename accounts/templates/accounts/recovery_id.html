@@ -2,12 +2,20 @@
 <!--오류나면 이 파일 지워 -혜준 -->
 {% extends 'base.html' %}
 
-{% block css %}
+{% block css %} <!--아래 두 줄 문제 생기면 지우기-->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.css">
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 <style type="text/css">
 main {
     margin-top: 30px;
     margin-left: 350px;
 }
+
+input[type="text"], input[type="email"] {
+    width: 400px;
+}
+
+
 </style>
 {% endblock %}
 
