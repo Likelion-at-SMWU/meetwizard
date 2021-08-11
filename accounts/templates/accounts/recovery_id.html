@@ -1,6 +1,12 @@
 <!-- templates/users/recovery_id.html -->
 <!--오류나면 이 파일 지워 -혜준 -->
+{% extends 'base.html' %}
 
+{% block css %}
+{% endblock %}
+
+{% block main-content %}
+<main>
 <div>
     {% csrf_token %}
     <label name="label_name" for="{{ form_id.name.id_for_label }}">{{ form.name.label }}</label>
@@ -48,3 +54,5 @@
         });
     </script>
 </div>
+</main>
+{% endblock %}

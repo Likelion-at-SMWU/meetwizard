@@ -410,7 +410,7 @@
         <div id="Mfriend_search_btn">
             <form id="form_search_username" method="GET" action="{% url 'searchUser' %}">
                 {% csrf_token %}
-                <input id="Mfriend_username" name="friend_username" type="text" placeholder="아이디를 입력하세요(입력 값 없이 검색시 모든 사용자가 조회됩니다.)" value="{{ search_username }}" onKeypress="javascript:if(event.keyCode==13) {document.getElementById('form_search_username').submit();}" />
+                <input id="Mfriend_username" name="friend_username" type="text" placeholder="아이디를 입력하세요. (입력 값 없이 검색시 모든 사용자가 조회됩니다.)" value="{{ search_username }}" onKeypress="javascript:if(event.keyCode==13) {document.getElementById('form_search_username').submit();}" />
             </form>
             <img class="Mfriend_search_btn" src="{% static 'images/search.png' %}" onclick="document.getElementById('form_search_username').submit();"/>
         </div>

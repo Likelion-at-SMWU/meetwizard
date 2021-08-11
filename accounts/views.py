@@ -4,12 +4,16 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render, get_object_or_404, redirect
 from accounts.forms import UserCreationForm
-from .forms import CustomUserChangeForm
+from .forms import CustomUserChangeForm, RecoveryIdForm
 from django.contrib import auth
 from meet.models import Friend
 from accounts.models import User
 from meet.models import Location, Schedule
 from django.contrib.auth.views import PasswordResetView
+from django.views.generic import View
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 # Create your views here.
 
@@ -126,29 +130,103 @@ class UserPasswordResetView(PasswordResetView):
         else:
             return render(self.request, 'password_reset_done_fail.html')
 
-# # users/views.py 오류나면 아래 다 지워 -혜준
+# users/views.py 오류나면 아래 다 지워 -혜준
 
-# from .forms import RecoveryIdForm
-# from django.views.generic import View
+@method_decorator(logout_message_required, name='dispatch')
+class RecoveryIdView(View):
+    template_name = 'users/recovery_id.html'
+    form = RecoveryIdForm
 
-# @method_decorator(logout_message_required, name='dispatch')
-# class RecoveryIdView(View):
-#     template_name = 'users/recovery_id.html'
-#     form = RecoveryIdForm
+    def get(self, request):
+        if request.method=='GET':
+            form = self.recovery_id(None)
+        return render(request, self.template_name, { 'form':form, })
 
-#     def get(self, request):
-#         if request.method=='GET':
-#             form = self.recovery_id(None)
-#         return render(request, self.template_name, { 'form':form, })
+# users/views.py 오류나면 아래 다 지워 -혜준
 
-# # users/views.py 오류나면 아래 다 지워 -혜준
+def ajax_find_id_view(request):
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    result_id = User.objects.get(name=name, email=email)
 
-# import json
-# from django.core.serializers.json import DjangoJSONEncoder
+    return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")
 
-# def ajax_find_id_view(request):
-#     name = request.POST.get('name')
-#     email = request.POST.get('email')
-#     result_id = User.objects.get(name=name, email=email)
+# 비밀번호 찾기 오류나면 주석처리 해줘 -다연
+from .forms import RecoveryPwForm
 
-#     return HttpResponse(json.dumps({"result_id": result_id.user_id}, cls=DjangoJSONEncoder), content_type = "application/json")
+@method_decorator(logout_message_required, name='dispatch')
+class RecoveryPwView(View):
+    template_name = 'accounts/recovery_pw.html'
+    recovery_pw = RecoveryPwForm
+
+    def get(self, request):
+        if request.method=='GET':
+            form = self.recovery_pw(None)
+            return render(request, self.template_name, { 'form':form, })
+
+from .helper import email_auth_num
+
+# 비밀번호 찾기 인증메일 발송
+def ajax_find_pw_view(request):
+    username = request.POST.get('username')
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    target_user = User.objects.get(username=username, name=name, email=email)
+
+    if target_user:
+        auth_num = email_auth_num()
+        target_user.auth = auth_num 
+        target_user.save()
+
+        send_mail(
+            '비밀번호 찾기 인증메일입니다.',
+            [email],
+            html=render_to_string('accounts/recovery_email.html', {
+                'auth_num': auth_num,
+            }),
+        )
+    return HttpResponse(json.dumps({"result": target_user.username}, cls=DjangoJSONEncoder), content_type = "application/json")
+
+# 비밀번호 찾기 인증코드 맞는지 확인
+def auth_confirm_view(request):
+    username = request.POST.get('username')
+    input_auth_num = request.POST.get('input_auth_num')
+    target_user = User.objects.get(username=username, auth=input_auth_num)
+    target_user.auth = ""
+    target_user.save()
+    request.session['auth'] = target_user.username  
+    
+    return HttpResponse(json.dumps({"result": target_user.username}, cls=DjangoJSONEncoder), content_type = "application/json")
+
+# 비밀번호 찾기를 통한 변경 후 리다이렉트
+from .forms import CustomSetPasswordForm        
+
+@logout_message_required
+def auth_pw_reset_view(request):
+    if request.method == 'GET':
+        if not request.session.get('auth', False):
+            raise PermissionDenied
+
+    if request.method == 'POST':
+        session_user = request.session['auth']
+        current_user = User.objects.get(username=session_user)
+        login(request, current_user)
+
+        reset_password_form = CustomSetPasswordForm(request.user, request.POST)
+        
+        if reset_password_form.is_valid():
+            user = reset_password_form.save()
+            messages.success(request, "비밀번호 변경완료! 변경된 비밀번호로 로그인하세요.")
+            logout(request)
+            return redirect('users:login')
+        else:
+            logout(request)
+            request.session['auth'] = session_user
+    else:
+        reset_password_form = CustomSetPasswordForm(request.user)
+
+    return render(request, 'users/password_reset.html', {'form':reset_password_form})
+
+
+
+
