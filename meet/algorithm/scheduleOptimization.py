@@ -37,7 +37,14 @@ def scheduleDivideIntoFour(memberSchedules, userCnt: int):
             red_cnt += 1
         elif (schedule.value == 1): #green + 1
             green_cnt += 1
-    result_list.append(MemberSchedule(member=0, day=prev_day, time=prev_time, value=0.5))   #마지막 결과 result_list에 추가
+
+    #for문 종료 후 마지막 값 저장
+    if (red_cnt == userCnt): v = -1         #모두 red라면 진한 빨강
+    elif (red_cnt > 0): v = -1 * (red_cnt / userCnt)  #red가 하나라도 있으면 옅은 빨강(개수에 비례함)
+    elif (green_cnt == userCnt): v = 1      #모두 green이라면 진한 녹색
+    elif (green_cnt > 0): v = green_cnt / userCnt #red는 없고 green만 일부 있으면 옅은 녹색(개수에 비례함)
+
+    result_list.append(MemberSchedule(member=0, day=prev_day, time=prev_time, value=v))   #마지막 결과 result_list에 추가
     
     return result_list
 
