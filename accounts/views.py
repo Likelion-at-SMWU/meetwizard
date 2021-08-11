@@ -55,18 +55,6 @@ def logout(request):
     return render(request, 'accounts/signup.html')
 
 @login_required
-def setting(request):
-    if request.method == 'POST':
-        user_change_form = CustomUserChangeForm(request.POST, instance = request.user)
-        if user_change_form.is_valid():
-            user_change_form.save()
-            return redirect('accounts:setting', request.user.username)
-
-    else:
-        user_change_form = CustomUserChangeForm(instance = request.user)
-        return render(request, 'accounts/setting.html', {'user_change_form':user_change_form})
-
-@login_required
 def delete(request):
     if request.method == 'POST':
         request.user.delete()
@@ -99,9 +87,19 @@ def update(request):
         'leftType':2,   
         'location':Location.objects.filter(user=request.user).first(),
         'schedules':Schedule.objects.filter(user=request.user),
-    }
-    user_change_form = CustomUserChangeForm(instance = request.user)
-    return render(request, 'accounts/update.html', {'user_change_form':user_change_form})
+        }
+    if request.method == 'POST':
+        if password_change_form.is_valid():
+            user_change_form = CustomUserChangeForm(request.user, request.POST)
+            user = user_change_form.save()
+            return redirect('accounts_update')
+        else:
+            user_change_form = CustomUserChangeForm(instance = request.user)
+            return render(request, 'accounts/update.html', {'error':'개인정보 수정에 실패하였습니다. \n값을 정확히 입력했는지 확인해주세요.', 'user_change_form':user_change_form})
+
+    else:
+        user_change_form = CustomUserChangeForm(instance = request.user)
+        return render(request, 'accounts/update.html', {'user_change_form':user_change_form})
 
 
 class UserPasswordResetView(PasswordResetView):
