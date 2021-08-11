@@ -14,8 +14,7 @@ SECRET_KEY = os.environ.get(
 ) # 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = (os.environ.get('DEBUG', 'True') != 'False')
-DEBUG = True
+DEBUG = (os.environ.get('DEBUG', 'True') != 'False')
 
 ALLOWED_HOSTS = ['*']   #모두 접근 가능하게 함
 
