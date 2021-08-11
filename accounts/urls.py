@@ -21,7 +21,6 @@ urlpatterns = [
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view()),
-    path('password_reset/', views.UserPasswordResetView.as_view(), name="password_reset"),
 
     # 비밀번호 찾기 url 오류나면 지워주세요 -다연
     path('recovery/pw/', views.RecoveryPwView.as_view(), name='recovery_pw'),
