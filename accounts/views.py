@@ -84,10 +84,14 @@ def password(request):
             user = password_change_form.save()
             update_session_auth_hash(request, user)
             return redirect('login') 
+
+        else:
+            password_change_form = PasswordChangeForm(request.user)
+            return render(request, 'accounts/password.html',{'error':'비밀번호 변경에 실패하였습니다.\n값을 정확히 입력했는지 확인해주세요.', 'password_change_form':password_change_form})
     
     else:
         password_change_form = PasswordChangeForm(request.user)
-        return render(request, 'accounts/password.html',{'error':'비밀번호 변경에 실패하였습니다.', 'password_change_form':password_change_form})
+        return render(request, 'accounts/password.html',{'password_change_form':password_change_form}
 
 @login_required
 def update(request):

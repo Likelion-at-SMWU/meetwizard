@@ -4,11 +4,15 @@
 
 {% block css %}
 <style type="text/css">
-
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
 </style>
 {% endblock %}
 
 {% block main-content %} 
+<main>
 <div class="container">
     <h3>Settings </h3>
     <p>{{ user.username }}님의 계정정보를 수정하실 수 있습니다.</p>
@@ -22,5 +26,6 @@
         {% endfor %}
     </div>
 </div>
+</main>
 {% endblock %}
 

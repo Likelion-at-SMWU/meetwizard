@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
-{% block main-content %}
 
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.css">
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<style type="text/css">
+    /* main의 margin-left 값은 (.left의 width + 20px) */
+    main {
+        margin-top: 30px;
+        margin-left: 350px;
+    }
+
+    #id_password {
+        display: none;
+    }
+
+</style>
+{% endblock %}
+
+{% block main-content %}
 <main>
 <h1>User delete</h1>
 <form method="POST">
@@ -9,5 +26,4 @@
     <input type="submit" value="탈퇴"/>
 </form>
 </main>
-
 {% endblock %}
