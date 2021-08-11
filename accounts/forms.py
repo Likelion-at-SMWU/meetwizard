@@ -98,24 +98,24 @@ class CustomUserChangeForm(UserChangeForm):
 # users/forms.py 오류나면 아래 다 지워 -혜준
 
 class RecoveryIdForm(forms.Form):
-     name = forms.CharField(widget=forms.TextInput,)
-     email = forms.EmailField(widget=forms.EmailInput,)
+    name = forms.CharField(widget=forms.TextInput,)
+    email = forms.EmailField(widget=forms.EmailInput,)
 
-     class Meta:
-         fields = ['name', 'email']
+    class Meta:
+        fields = ['name', 'email']
 
-     def __init__(self, *args, **kwargs):
-         super(RecoveryIdForm, self).__init__(*args, **kwargs)
-         self.fields['name'].label = '이름'
-         self.fields['name'].widget.attrs.update({
-             'class': 'form-control',
-             'id': 'form_name',
-         })
-         self.fields['email'].label = '이메일'
-         self.fields['email'].widget.attrs.update({
-             'class': 'form-control',
-             'id': 'form_email' 
-         })
+    def __init__(self, *args, **kwargs):
+        super(RecoveryIdForm, self).__init__(*args, **kwargs)
+        self.fields['name'].label = '이름'
+        self.fields['name'].widget.attrs.update({
+            'class': 'form-control',
+            'id': 'form_name',
+        })
+        self.fields['email'].label = '이메일'
+        self.fields['email'].widget.attrs.update({
+            'class': 'form-control',
+            'id': 'form_email' 
+        })
 
 
 # 비밀번호 찾기 forms.py 오류나면 그냥 싹 주석처리 해줘 -다연 
