@@ -15,6 +15,7 @@ from django.views.generic import View
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from .decorators import login_message_required, admin_required, logout_message_required
+from .helper import send_mail, email_auth_num
 from accounts.decorators import *
 
 
